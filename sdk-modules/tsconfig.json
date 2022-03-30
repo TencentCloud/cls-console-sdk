@@ -1,0 +1,35 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "newLine": "lf",
+    "moduleResolution": "Node",
+    "preserveConstEnums": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "charset": "utf8",
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "paths": {
+      "@tencent/tea-sdk-runner": ["./src/lib/tea-sdk-runner/src"],
+      "@tencent/tea-sdk-runner/lib/*": ["./src/lib/tea-sdk-runner/src/*"],
+      "@tencent/tea-sdk-cls-types": ["./src/lib/tea-sdk-cls-types/types/src/sdk"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.js", "./**/*.tsx", "./**/*.jsx", "./**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
