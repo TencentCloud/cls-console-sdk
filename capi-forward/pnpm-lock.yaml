@@ -6,6 +6,7 @@ specifiers:
   '@nestjs/core': ^8.2.4
   '@nestjs/platform-express': ^8.2.4
   '@nestjs/schematics': ^8.0.5
+  '@nestjs/serve-static': ^2.2.2
   '@nestjs/testing': ^8.2.4
   '@types/express': ^4.17.13
   '@types/jest': ^27.0.3
@@ -36,6 +37,7 @@ dependencies:
   '@nestjs/common': 8.4.2_e7ea248743279784063e3708d703abc5
   '@nestjs/core': 8.4.2_c19d2ec2e65d58045ebcb73ac916a0e0
   '@nestjs/platform-express': 8.4.2_44cf05fcc0e49f3653826a45aec0eb54
+  '@nestjs/serve-static': 2.2.2_44cf05fcc0e49f3653826a45aec0eb54
   bcryptjs: 2.4.3
   cookie-parser: 1.4.6
   dotenv: 10.0.0
@@ -916,6 +918,17 @@ packages:
     transitivePeerDependencies:
       - chokidar
     dev: true
+
+  /@nestjs/serve-static/2.2.2_44cf05fcc0e49f3653826a45aec0eb54:
+    resolution: {integrity: sha512-3Mr+Q/npS3N7iGoF3Wd6Lj9QcjMGxbNrSqupi5cviM0IKrZ1BHl5qekW95rWYNATAVqoTmjGROAq+nKKpuUagQ==}
+    peerDependencies:
+      '@nestjs/common': ^6.0.0 || ^7.0.0 || ^8.0.0
+      '@nestjs/core': ^6.0.0 || ^7.0.0 || ^8.0.0
+    dependencies:
+      '@nestjs/common': 8.4.2_e7ea248743279784063e3708d703abc5
+      '@nestjs/core': 8.4.2_c19d2ec2e65d58045ebcb73ac916a0e0
+      path-to-regexp: 0.1.7
+    dev: false
 
   /@nestjs/testing/8.4.2_94bcbca36a3e7f37e557481eaac93bd6:
     resolution: {integrity: sha512-vb8sJTjdakqa9k5tMdcKJf8lG3TT7ekwaVbQ4FXGBjjYrriILYioQv23kkKrgOkT1HErUPdYAgeECw5qE8MIzg==}

@@ -6,6 +6,7 @@ const demoPassword = process.env.demoPassword
   ? bcryptjs.hashSync(process.env.demoPassword, 10)
   : '';
 const EXPIRES_DAYS = 2;
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -27,7 +28,7 @@ export class AppController {
     });
   }
 
-  @Post('/login')
+  @Post('/user/login')
   login(@Body() body, @Res({ passthrough: true }) res: Response): any {
     const { pwd } = body;
     if (!pwd || !bcryptjs.compareSync(pwd, demoPassword)) {
@@ -51,7 +52,7 @@ export class AppController {
     }
   }
 
-  @Get('/isLog')
+  @Get('/user/isLog')
   isLog(@Req() request: Request, @Res({ passthrough: true }) res: Response) {
     if (!demoPassword || request?.cookies?.['demo-token'] === demoPassword) {
       return { data: 'pass' };

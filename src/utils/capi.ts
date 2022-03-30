@@ -2,7 +2,8 @@ import { CAPIRequest } from '../../sdk-modules/src';
 import { constants as consoleConstants } from '../../sdk-modules/src/lib/tea-sdk-runner/src/modules/constants';
 import { IApiResponse } from './types';
 
-const capiForwardUrl = 'http://127.0.0.1:3001';
+// 开发模式前后端分离，部署时直接使用nest进行部署
+const capiForwardUrl = import.meta.env.DEV ? 'http://127.0.0.1:3001' : '';
 
 export async function GetForwardData(url = '/') {
   const response = await fetch(capiForwardUrl + url);

@@ -35,7 +35,7 @@ export const verifyLogin = (forceUpdate: () => void) =>
 
 const LoginForward = async function (pwd): Promise<IApiResponse> {
   try {
-    const response = await postForwardData('/login', { pwd });
+    const response = await postForwardData('/user/login', { pwd });
     if (response?.code) {
       console.log('LoginForward Error: ', response);
       return Promise.reject(response);
@@ -50,6 +50,6 @@ const LoginForward = async function (pwd): Promise<IApiResponse> {
 };
 
 const isLog = async () => {
-  const response = await getForwardData('/isLog');
+  const response = await getForwardData('/user/isLog');
   return response.data !== 'failed';
 };

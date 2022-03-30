@@ -38,21 +38,23 @@ export function SearchPage() {
 
   return (
     <div>
-      <div style={{ padding: 20, borderBottom: '1px solid black' }}>
-        调试逻辑，完成调试后删除本段代码
-        <p>
-          {JSON.stringify({
-            region: pageParams.region,
-            topic_id: pageParams.topicId,
-            logset_name: pageParams.logsetName,
-            topic_name: pageParams.topicName,
-            query: pageParams.query,
-            time: pageParams.time,
-            filter: pageParams.filter,
-          })}
-        </p>
-        <p>{JSON.stringify(hideParams)}</p>
-      </div>
+      {import.meta.env.DEV && (
+        <div style={{ padding: 20, borderBottom: '1px solid black' }}>
+          调试逻辑，完成调试后删除本段代码
+          <p>
+            {JSON.stringify({
+              region: pageParams.region,
+              topic_id: pageParams.topicId,
+              logset_name: pageParams.logsetName,
+              topic_name: pageParams.topicName,
+              query: pageParams.query,
+              time: pageParams.time,
+              filter: pageParams.filter,
+            })}
+          </p>
+          <p>{JSON.stringify(hideParams)}</p>
+        </div>
+      )}
       <SdkSearchPage
         controlRef={searchPageControlRef}
         hideParams={hideParams}
