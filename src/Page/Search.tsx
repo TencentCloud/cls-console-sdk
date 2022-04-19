@@ -24,8 +24,8 @@ export function SearchPage() {
   } as any;
 
   const hideParams: ISdkSearchPageProps['hideParams'] = {
-    hideTopicSelect: true, // 外部SDK方案不支持直接切换日志主题
-    hideHeader: true, // Boolean(searchParams.get('hideHeader')),
+    hideTopicSelect: Boolean(searchParams.get('hideTopicSelect')),
+    hideHeader: Boolean(searchParams.get('hideHeader')),
     hideTopTips: Boolean(searchParams.get('hideTopTips')),
     hideConfigMenu: Boolean(searchParams.get('hideConfigMenu')),
     hideLogDownload: Boolean(searchParams.get('hideLogDownload')),

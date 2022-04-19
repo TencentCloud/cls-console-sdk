@@ -1,12 +1,17 @@
 # CLS 控制台独立运行环境
 
-控制台独立运行环境，允许业务方独立运行CLS控制台，使用检索分析页面和仪表盘页面。
+本项目是基于 `sdk-modules` 文件夹，实现的 独立运行环境 快速体验样例。允许业务方将CLS控制台集成到自身页面，使用检索分析页面和仪表盘能力。
 
-检索分析页面：支持使用日志检索和日志分析能力，不提供日志主题切换功能。
-仪表盘页面：支持查看指定仪表盘内容，不提供编辑能力。
+为达成业务对权限管控和页面集成的相关诉求，需要进行前端页面嵌入 和 后端接入层转发 逻辑的开发工作，详情请参考 [独立运行环境接入文档](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/%E5%AE%9A%E5%88%B6%E5%8C%96%E5%BC%80%E5%8F%91.md)。
 
 
-## 使用前提
+
+注意：<br />
+对于仅需要实现控制台免登陆访问，无需特殊权限管控的客户，为减少工作量，
+推荐使用 [roleAccess 免登陆访问](https://cloud.tencent.com/document/product/614/45742)，
+相关效果可参考 [演示示例](https://github.com/TencentCloud/cls-iframe-demo)。
+
+## 演示使用前提
 
 创建 `./capi-forward/.env` 文件, 填写[秘钥信息](https://console.cloud.tencent.com/cam/capi) 和 环境密码。
 ```dotenv
@@ -19,9 +24,12 @@ demoPassword=123456
 
 ## 部署项目
 ### 容器化运行方案
-> 如未使用 docker compose，可参考 [Install Docker Compose](https://docs.docker.com/compose/install/#install-compose) 文档
->
-> 在项目根目录执行 `docker compose --env-file ./capi-forward/.env up` 命令。
+> 从源码构建最新镜像版本 
+> `docker build . --tag=cls_web`
+> 
+> 运行容器
+> `docker run --env-file ./capi-forward/.env -p 3001:3001 cls_web`
+
 
 ### Node.js 运行方案
 1. 使用 pnpm 安装依赖。
@@ -69,7 +77,3 @@ const url = 'http://localhost:3001/search?region=${Region}&topic_id=${TopicId}&q
 
 prepareSdkFrame(url)
 ```
-
-### 参考文档：
-
-[自定义鉴权方案](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/%E5%AE%9A%E5%88%B6%E5%8C%96%E5%BC%80%E5%8F%91.md)
