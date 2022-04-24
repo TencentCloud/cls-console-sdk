@@ -8,17 +8,27 @@ export function DashboardPage() {
   const dashboardPageControlRef = useRef<ISdkDashboardPageControl | null>(null as any);
 
   const [searchParams] = useSearchParams();
-  const dashboardId = searchParams.get('id') ?? '';
+  const params = Object.fromEntries(searchParams.entries());
 
-  // return <SdkDashboard controlRef={dashboardPageControlRef} pageParams={{ id: dashboardId }} />;
+  // return <SdkDashboard controlRef={dashboardPageControlRef} pageParams={{ id: '' }} />;
 
   const domId = 'cls-sdk-area';
   useEffect(() => {
     const ele = document.querySelector(`#${domId}`)!;
     if (ele) {
+      const hideParams: any = {};
+      const pageParams: any = {};
+      Object.keys(params).forEach((key) => {
+        if (key.startsWith('hide')) {
+          hideParams[key] = params[key];
+        } else {
+          pageParams[key] = params[key];
+        }
+      });
       const { controlRef, destroy } = renderSdkDashboard(
         {
-          pageParams: { id: dashboardId },
+          pageParams,
+          hideParams,
         },
         ele,
       );
@@ -28,6 +38,6 @@ export function DashboardPage() {
         destroy?.();
       };
     }
-  }, [dashboardId]);
+  }, [params]);
   return <div id={domId} />;
 }
