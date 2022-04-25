@@ -1,15 +1,23 @@
 import React, { useCallback, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { decode as base64urlDecode } from 'universal-base64url';
 
 import { SdkSearchPage } from '@tencent/cls-sdk-modules';
 import { ISdkSearchPageControl, ISdkSearchPageProps } from '@tencent/tea-sdk-cls-types';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __DEV__ = import.meta.env.DEV;
+
 /** 此组件为Iframe场景设计，通过与控制台相同的路由值，完成页面初始化。不支持页面内容选择日志主题 */
 export function SearchPage() {
   const searchPageControlRef = useRef<ISdkSearchPageControl>(null);
 
-  // 初始值使用路由值。后续仅接受页面内数据修改，使用方可自行修改路由逻辑
+  const navigate = useNavigate();
+  if (__DEV__) {
+    (window as any).sdkNavigate = navigate;
+  }
+
+  // 初始值使用路由值。后续仅接受页面内数据修改，使用方可自行修改路由逻辑。此组件每次重渲染时，如有参数值变化，SDK内部路由将重新应用
   const [searchParams] = useSearchParams();
 
   const pageParams: ISdkSearchPageProps['pageParams'] = {
@@ -32,13 +40,13 @@ export function SearchPage() {
   };
 
   const onPageParamsUpdate = useCallback((params: ISdkSearchPageProps['pageParams']) => {
-    // 当前组件设计为iframe方案，不进行路由同步。对于需要定制开发的用户，可自行处理 onPageParamsUpdate 逻辑
+    // 当前组件设计为内嵌方案，不进行浏览器路由同步。对于需要定制开发的用户，可自行处理 onPageParamsUpdate 逻辑
     console.log('sdk params change: ', JSON.stringify(params));
   }, []);
 
   return (
     <div>
-      {import.meta.env.DEV && (
+      {__DEV__ && (
         <div style={{ padding: 20, borderBottom: '1px solid black' }}>
           调试逻辑，完成调试后删除本段代码
           <p>

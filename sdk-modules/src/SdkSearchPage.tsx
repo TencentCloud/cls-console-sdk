@@ -1,7 +1,8 @@
-import { ISdkApi, ISdkSearchPageControl, ISdkSearchPageProps } from '@tencent/tea-sdk-cls-types';
-import { SDKLoader } from '@tencent/tea-sdk-runner';
 import React, { forwardRef } from 'react';
 import ReactDOM from 'react-dom';
+
+import { ISdkApi, ISdkSearchPageControl, ISdkSearchPageProps } from '@tencent/tea-sdk-cls-types';
+import { SDKLoader } from '@tencent/tea-sdk-runner';
 
 export const SdkSearchPage = forwardRef((params: ISdkSearchPageProps) => {
   if (!(window as any).TeaSDKRunner) {

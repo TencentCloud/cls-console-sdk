@@ -19,11 +19,15 @@ window.moment = moment;
 (window as any).QCMAIN_HOST = 'cloud.tencent.com';
 
 export async function initSdkRunner(params: ClsSdkInitParams) {
-  const { capi, config = {} as any } = params;
-  //     config: {
-  //        js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.78d6edd471.js?max_age=31536000',
-  //        css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.502f5b5943.css?max_age=31536000',
-  //          }
+  const {
+    capi,
+    config = {
+      // 如果需要配置使用特定的SDK版本，可以在这里配置
+      // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.17b784140b.js?max_age=31536000',
+      // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.5671c95ff1.css?max_age=31536000',
+    } as any,
+  } = params;
+
   if (!capi) {
     return Promise.reject('init params error!');
   }
