@@ -6,11 +6,10 @@
     "preinstall": "npx only-allow pnpm",
     "devPrepare": "pnpm recursive install",
     "dev": "vite --port 8080",
+    "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "tsc && vite build",
     "build:backend": "cd ./capi-forward && npm run build",
-    "build": "npm run build:frontend && npm run build:backend",
-    "serve": "cd ./capi-forward && node ./dist/main.js",
-    "dockerCompose": "docker compose --env-file ./capi-forward/.env up"
+    "serve": "cd ./capi-forward && node ./dist/main.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -36,6 +36,8 @@ demoPassword=123456
 > 如未使用 pnpm，请先 [安装](https://pnpm.io/zh/installation) 。
 >
 > 在项目根目录执行 `pnpm recursive install` 命令安装依赖。
+> 
+> 如遇到安装出错，请在项目根目录运行 `find . -name "node_modules" -type d -exec rm -rf '{}' +` 命令后重新进行安装。 
 
 2. 项目构建与运行
 > 在项目根目录运行 `npm run build` 完成项目构建。
