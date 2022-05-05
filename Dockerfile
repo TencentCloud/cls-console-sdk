@@ -7,7 +7,7 @@ WORKDIR /BUILD
 COPY . /BUILD
 
 RUN npm i -g pnpm pm2
-RUN pnpm recursive install
+RUN pnpm recursive install --frozen-lockfile=true
 RUN pnpm run build
 
 
