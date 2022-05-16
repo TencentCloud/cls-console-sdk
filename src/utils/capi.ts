@@ -1,6 +1,6 @@
 import { CAPIRequest } from '../../sdk-modules/src';
 import { constants as consoleConstants } from '../../sdk-modules/src/lib/tea-sdk-runner/src/modules/constants';
-import { IApiResponse } from './types';
+import { IApiResponse, IApiError } from './types';
 
 // 开发模式前后端分离，部署时直接使用nest进行部署
 const capiForwardUrl = import.meta.env.DEV ? 'http://127.0.0.1:3001' : '';
@@ -36,7 +36,7 @@ export async function getForwardData(url = '', data = '') {
 }
 
 /** 需要返回一个 Promise<IApiResponse> 或者在出错情况下，返回Promise.reject(IApiError) */
-export const CApiForward: CAPIRequest = async function (body): Promise<IApiResponse> {
+export const CApiForward: CAPIRequest = async function (body): Promise<IApiResponse | IApiError> {
   // console.log('CApiForward', body);
   try {
     const { Version, ...restData } = body.data;
@@ -55,14 +55,19 @@ export const CApiForward: CAPIRequest = async function (body): Promise<IApiRespo
       data: (window as any).debugError ? body.data : restData,
     };
 
-    const response = await postForwardData('/capi', param);
-    if (response?.code) {
+    const response = await postForwardData('/forward', param);
+    if (response?.Response?.Error) {
+      const err = response?.Response?.Error;
       // console.log('CApiForward Error: ', response);
-      return Promise.reject(response);
+      return Promise.reject({
+        code: err.Code,
+        name: err.Code,
+        message: err.Message,
+        data: response,
+      });
     }
 
-    // console.log('CApiForward Response: ', response);
-    return response.data;
+    return response;
   } catch (e) {
     console.log('CApiForward Error: ', e);
     return Promise.reject(e);

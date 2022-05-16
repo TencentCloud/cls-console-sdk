@@ -13,10 +13,16 @@ export class AppController {
 
   @Get('/test')
   testRequest(): any {
-    return this.appService.testRequest();
+    return this.appService.doCApiRequest({
+      action: 'DescribeTopics',
+      data: { Limit: 20, Offset: 0 },
+      region: 'ap-shanghai',
+      service: 'cls',
+      version: '2020-10-16',
+    });
   }
 
-  @Post('/capi')
+  @Post('/forward')
   capiRequest(@Body() body): any {
     const { action, data, region, service, version } = body;
     return this.appService.doCApiRequest({

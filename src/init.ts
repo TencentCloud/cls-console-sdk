@@ -6,7 +6,7 @@ import { IApiResponse } from './utils/types';
 // 登录 验证密码
 export const verifyPassword = async (pwd: string, forceUpdate: () => void) => {
   try {
-    await LoginForward(pwd);
+    await Login(pwd);
     if (!(window as any).TeaSDKRunner) {
       initSdkRunner({ capi: CApiForward }).then(() => forceUpdate());
     }
@@ -33,7 +33,7 @@ export const verifyLogin = (forceUpdate: () => void) =>
       return { showModal: true };
     });
 
-const LoginForward = async function (pwd): Promise<IApiResponse> {
+async function Login(pwd): Promise<IApiResponse> {
   try {
     const response = await postForwardData('/user/login', { pwd });
     if (response?.code) {
@@ -47,7 +47,7 @@ const LoginForward = async function (pwd): Promise<IApiResponse> {
     console.log('CApiForward Error: ', e);
     return Promise.reject(e);
   }
-};
+}
 
 const isLog = async () => {
   const response = await getForwardData('/user/isLog');

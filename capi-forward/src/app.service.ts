@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http/http_connection';
 import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
-import { IApiError, IApiResponse } from './types';
+import { IAPIErrorResponse, IApiResponse } from './types';
 
 type ResponseData = any;
 
@@ -33,43 +33,25 @@ const profile = {
 
 @Injectable()
 export class AppService {
-  async testRequest() {
-    return AppService.doRequestWithSign3({
-      action: 'DescribeTopics',
-      data: { Limit: 20, Offset: 0 },
-      region: 'ap-shanghai',
-      service: 'cls',
-      version: '2020-10-16',
-    });
-  }
-
   async doCApiRequest(
     param: Parameters<typeof AppService.doRequestWithSign3>[0],
-  ): Promise<IApiResponse | IApiError> {
+  ): Promise<IApiResponse | IAPIErrorResponse> {
     try {
       const response = await AppService.doRequestWithSign3(param);
       return {
-        code: 0,
-        data: {
-          Response: response,
-        },
+        Response: response,
       };
     } catch (e) {
       console.log('doRequestWithSign3 error: ', e);
       if (e.code && e.message) {
         const err: TencentCloudSDKHttpException = e;
         return {
-          code: err.code,
-          name: err.code,
-          message: err.message,
-          data: {
-            Response: {
-              Error: {
-                Code: err.code,
-                Message: err.message,
-              },
-              RequestId: err.requestId,
+          Response: {
+            Error: {
+              Code: err.code,
+              Message: err.message,
             },
+            RequestId: err.requestId,
           },
         };
       }
