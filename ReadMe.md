@@ -2,7 +2,7 @@
 
 本项目是基于 `sdk-modules` 文件夹，实现的 独立运行环境 快速体验样例。允许业务方将CLS控制台集成到自身页面，使用检索分析页面和仪表盘能力。
 
-为达成业务对权限管控和页面集成的相关诉求，需要进行前端页面嵌入 和 后端接入层转发 逻辑的开发工作，详情请参考 [独立运行环境接入文档](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/%E5%AE%9A%E5%88%B6%E5%8C%96%E5%BC%80%E5%8F%91.md)。
+为达成业务对权限管控和页面集成的相关诉求，需要进行前端页面嵌入 和 后端接入层转发 逻辑的开发工作，详情请参考 [独立运行环境接入文档](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/ReadMe.md)。
 
 
 

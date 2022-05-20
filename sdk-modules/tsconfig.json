@@ -1,6 +1,8 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "outDir": "./types",
+    "declaration": true,
     "baseUrl": ".",
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -31,5 +33,5 @@
     }
   },
   "include": ["./**/*.ts", "./**/*.js", "./**/*.tsx", "./**/*.jsx", "./**/*.d.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "types", "lib"]
 }

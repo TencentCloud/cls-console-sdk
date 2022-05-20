@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { renderSdkDashboard, SdkDashboard, ISdkDashboardPageControl } from '../../sdk-modules/src';
+import { ISdkDashboardPageControl, renderSdkDashboard } from '@tencent/cls-sdk-modules';
 
 export function DashboardPage() {
   const dashboardPageControlRef = useRef<ISdkDashboardPageControl | null>(null as any);

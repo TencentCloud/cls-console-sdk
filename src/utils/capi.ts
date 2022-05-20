@@ -1,6 +1,7 @@
-import { CAPIRequest } from '../../sdk-modules/src';
-import { constants as consoleConstants } from '../../sdk-modules/src/lib/tea-sdk-runner/src/modules/constants';
-import { IApiResponse, IApiError } from './types';
+import { CAPIRequest } from '@tencent/cls-sdk-modules';
+
+import { REGIONIDMAP } from './constants';
+import { IApiError, IApiResponse } from './types';
 
 // 开发模式前后端分离，部署时直接使用nest进行部署
 const capiForwardUrl = import.meta.env.DEV ? 'http://127.0.0.1:3001' : '';
@@ -48,7 +49,7 @@ export const CApiForward: CAPIRequest = async function (body): Promise<IApiRespo
       version: string;
     } = {
       service: body.serviceType,
-      region: consoleConstants.REGIONIDMAP[body.regionId],
+      region: REGIONIDMAP[body.regionId],
       action: body.cmd,
       version: Version,
       /** 调试逻辑，用于生成一个云API错误 */

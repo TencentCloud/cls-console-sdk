@@ -4,6 +4,7 @@ import { setup } from '@tencent/tea-sdk-runner';
 import { SDKRunnerSetupOptions } from '@tencent/tea-sdk-runner/lib/type';
 
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
+
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
 export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | 'requireRegionData' | 'loginInfo'> {
@@ -23,8 +24,8 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     capi,
     config = {
       // 如果需要配置使用特定的SDK版本，可以在这里配置
-      // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.1c72ea43c5.js?max_age=31536000',
-      // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.e42b6245c9.css?max_age=31536000',
+      // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.048b3bc08c.js?max_age=31536000',
+      // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.f91d69c075.css?max_age=31536000',
     } as any,
   } = params;
 
