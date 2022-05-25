@@ -10,9 +10,16 @@ const CLS_SDK_VERSION = 'cls-sdk-version';
 export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | 'requireRegionData' | 'loginInfo'> {
   /** 重要：需要将页面发出的请求内容，转发到腾讯云接口 */
   capi: SDKRunnerSetupOptions['capi'];
+  /** @internal 使用特定的SDK版本 */
   config?: {
     js: string;
     css: string;
+  };
+  /** @internal 使用特定的用户身份信息，测试专用 */
+  userIdentity?: {
+    AppId: number;
+    OwnerUin: string;
+    Uin: string;
   };
 }
 
@@ -27,33 +34,42 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.048b3bc08c.js?max_age=31536000',
       // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.f91d69c075.css?max_age=31536000',
     } as any,
+    userIdentity = {} as any,
   } = params;
 
   if (!capi) {
     return Promise.reject('init params error!');
   }
-  const loginInfo = await GetUserAppId(capi);
-  let { js } = config;
-  let { css } = config;
-  if (!js || !css) {
+
+  // 加载SDK最新版本号
+  if (!(config.js && config.css)) {
     const { Results } = await GetConsoleConfigVersion(capi);
     if (Results?.length) {
-      js = Results[0]?.Url ?? '';
-      css = Results[0]?.CSS?.[0] ?? '';
-      setLocalStorageItem(CLS_SDK_VERSION, JSON.stringify({ js, css }));
+      config.js = Results[0]?.Url ?? '';
+      config.css = Results[0]?.CSS?.[0] ?? '';
+      setLocalStorageItem(CLS_SDK_VERSION, JSON.stringify(config));
     } else {
       const version = safeJsonParse(getLocalStorageItem(CLS_SDK_VERSION));
-      js = version.js;
-      css = version.css;
+      config.js = version.js;
+      config.css = version.css;
     }
   }
+
+  // 加载用户ID信息
+  if (!(userIdentity.AppId && userIdentity.OwnerUin && userIdentity.Uin)) {
+    const loginInfo = await GetUserAppId(capi);
+    userIdentity.AppId = loginInfo.AppId;
+    userIdentity.OwnerUin = loginInfo.OwnerUin;
+    userIdentity.Uin = loginInfo.Uin;
+  }
+
   setup({
     requireRegionData: true,
     sdks: [
       {
         name: 'cls-sdk',
-        js,
-        css,
+        js: config.js,
+        css: config.css,
       },
     ],
 
@@ -64,9 +80,9 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       countryCode: '86',
       countryName: 'CN',
       identity: {},
-      appId: loginInfo.AppId,
-      loginUin: loginInfo.Uin,
-      ownerUin: loginInfo.OwnerUin,
+      appId: userIdentity.AppId,
+      loginUin: userIdentity.Uin,
+      ownerUin: userIdentity.OwnerUin,
     },
   });
 }
@@ -74,8 +90,8 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
 async function GetUserAppId(capi: SDKRunnerSetupOptions['capi']): Promise<{
   AppId: number;
   OwnerUin: string;
-  RequestId: string;
   Uin: string;
+  RequestId: string;
 }> {
   const res = await capi({
     regionId: 1,
