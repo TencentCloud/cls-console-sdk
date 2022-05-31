@@ -7,6 +7,7 @@ type ResponseData = any;
 
 const secretId = process.env.secretId;
 const secretKey = process.env.secretKey;
+const internal = process.env.internal === 'true';
 // console.log(secretId, secretKey);
 
 const profile = {
@@ -14,6 +15,9 @@ const profile = {
   httpProfile: {
     reqMethod: 'POST',
     endpoint: null,
+    endpointSuffix: internal
+      ? '.internal.tencentcloudapi.com'
+      : '.tencentcloudapi.com',
     protocol: 'https://',
     reqTimeout: 60,
   },
@@ -73,7 +77,7 @@ export class AppService {
     version: string;
   }): Promise<ResponseData> {
     let res;
-    const endpoint = service + '.tencentcloudapi.com';
+    const endpoint = service + profile.httpProfile.endpointSuffix;
     const url = profile.httpProfile.protocol + endpoint + profile.other.path;
     try {
       res = await HttpConnection.doRequestWithSign3({
