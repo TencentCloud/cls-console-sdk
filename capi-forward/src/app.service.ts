@@ -1,52 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http/http_connection';
 import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
 import { IAPIErrorResponse, IApiResponse } from './types';
+import { ConfigService } from '@nestjs/config';
+import { ClientConfig } from 'tencentcloud-sdk-nodejs/src/common/interface';
 
 type ResponseData = any;
-
-const secretId = process.env.secretId;
-const secretKey = process.env.secretKey;
-const internal = process.env.internal === 'true';
-// console.log(secretId, secretKey);
-
-const profile = {
-  signMethod: 'TC3-HMAC-SHA256',
-  httpProfile: {
-    reqMethod: 'POST',
-    endpoint: null,
-    endpointSuffix: internal
-      ? '.internal.tencentcloudapi.com'
-      : '.tencentcloudapi.com',
-    protocol: 'https://',
-    reqTimeout: 60,
-  },
-  language: 'zh-CN',
-
-  credential: {
-    secretId: secretId,
-    secretKey: secretKey,
-    token: '',
-  },
-  other: {
-    path: '/',
-    multipart: false,
-    sdkVersion: '',
-  },
-};
+interface doApiRequestParams {
+  action: string;
+  data: any;
+  region: string;
+  service: string;
+  version: string;
+}
 
 @Injectable()
 export class AppService {
+  private readonly logger = new Logger(AppService.name);
+
+  clientConfig: Partial<ClientConfig & { other: any }>;
+  constructor(private configService: ConfigService) {
+    this.clientConfig = {
+      profile: {
+        signMethod: 'TC3-HMAC-SHA256',
+        httpProfile: {
+          reqMethod: 'POST',
+          endpoint: null,
+          protocol: 'https://',
+          reqTimeout: 60,
+        },
+        language: 'zh-CN',
+      },
+      credential: {
+        secretId: configService.get('secretId'),
+        secretKey: configService.get('secretKey'),
+        token: '',
+      },
+      other: {
+        path: '/',
+        multipart: false,
+        requestClient: '',
+        endpointSuffix: configService.get('internal')
+          ? '.internal.tencentcloudapi.com'
+          : '.tencentcloudapi.com',
+      },
+    };
+  }
+
   async doCApiRequest(
-    param: Parameters<typeof AppService.doRequestWithSign3>[0],
+    param: doApiRequestParams,
   ): Promise<IApiResponse | IAPIErrorResponse> {
     try {
-      const response = await AppService.doRequestWithSign3(param);
+      const response = await this.doRequestWithSign3(param);
       return {
         Response: response,
       };
     } catch (e) {
-      console.log('doRequestWithSign3 error: ', e);
+      this.logger.log('doRequestWithSign3 error: ', e);
       if (e.code && e.message) {
         const err: TencentCloudSDKHttpException = e;
         return {
@@ -63,22 +73,19 @@ export class AppService {
     }
   }
 
-  static async doRequestWithSign3({
+  async doRequestWithSign3({
     action,
     data,
     region,
     service,
     version,
-  }: {
-    action: string;
-    data: any;
-    region: string;
-    service: string;
-    version: string;
-  }): Promise<ResponseData> {
+  }: doApiRequestParams): Promise<ResponseData> {
+    const clientConfig = this.clientConfig;
+    const { profile, credential } = clientConfig;
     let res;
-    const endpoint = service + profile.httpProfile.endpointSuffix;
-    const url = profile.httpProfile.protocol + endpoint + profile.other.path;
+    const endpoint = service + clientConfig.other.endpointSuffix;
+    const url =
+      profile.httpProfile.protocol + endpoint + clientConfig.other.path;
     try {
       res = await HttpConnection.doRequestWithSign3({
         region: region,
@@ -88,16 +95,15 @@ export class AppService {
         version: version,
 
         method: profile.httpProfile.reqMethod,
-        url: url,
-
         timeout: profile.httpProfile.reqTimeout * 1000,
-        secretId: profile.credential.secretId,
-        secretKey: profile.credential.secretKey,
-        token: profile.credential.token,
-
-        multipart: profile.other.multipart,
-        requestClient: profile.other.sdkVersion,
         language: profile.language,
+        url: url,
+        multipart: clientConfig.other.multipart,
+        requestClient: clientConfig.other.requestClient,
+
+        secretId: credential.secretId,
+        secretKey: credential.secretKey,
+        token: credential.token,
       });
     } catch (e) {
       throw new TencentCloudSDKHttpException(e.message);

@@ -4,7 +4,8 @@ import { REGIONIDMAP } from './constants';
 import { IApiError, IApiResponse } from './types';
 
 // 开发模式前后端分离，部署时直接使用nest进行部署
-const capiForwardUrl = import.meta.env.DEV ? 'http://127.0.0.1:3001' : '';
+const requestHost = import.meta.env.DEV ? 'http://127.0.0.1:3001' : '';
+const capiForwardUrl = (requestHost + import.meta.env.BASE_URL).slice(0, -1);
 
 export async function GetForwardData(url = '/') {
   const response = await fetch(capiForwardUrl + url);

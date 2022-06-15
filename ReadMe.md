@@ -22,12 +22,18 @@ secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #internal=true
 # 设置后支持密码鉴权，不设置则无任何鉴权
 demoPassword=123456
+# 可配置为子路径，用于重用域名，格式如 /cls_sdk
+# 想要使用容器时开启此配置，需要在构建时也配置环境变量值, 具体方式参考部署项目中的子路径介绍
+#basePath=YOUR_BASE_PATH
 ```
 
 ## 部署项目
 ### 容器化运行方案
 > 从源码构建最新镜像版本 
 > `docker build . --tag=cls_web`
+> 
+> 如果需要使用子路径，在环境变量中加入参数，并使用参数 basePath 构建镜像, YOUR_BASE_PATH为设置的环境变量值
+> `docker build --build-arg basePath=YOUR_BASE_PATH . --tag=cls_web`
 > 
 > 运行容器
 > `docker run --env-file ./capi-forward/.env -p 3001:3001 cls_web`
