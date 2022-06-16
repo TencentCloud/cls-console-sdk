@@ -6,7 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { ClientConfig } from 'tencentcloud-sdk-nodejs/src/common/interface';
 
 type ResponseData = any;
-interface doApiRequestParams {
+interface IApiRequestParams {
   action: string;
   data: any;
   region: string;
@@ -48,7 +48,7 @@ export class AppService {
   }
 
   async doCApiRequest(
-    param: doApiRequestParams,
+    param: IApiRequestParams,
   ): Promise<IApiResponse | IAPIErrorResponse> {
     try {
       const response = await this.doRequestWithSign3(param);
@@ -79,7 +79,7 @@ export class AppService {
     region,
     service,
     version,
-  }: doApiRequestParams): Promise<ResponseData> {
+  }: IApiRequestParams): Promise<ResponseData> {
     const clientConfig = this.clientConfig;
     const { profile, credential } = clientConfig;
     let res;
