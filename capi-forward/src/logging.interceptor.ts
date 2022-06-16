@@ -19,7 +19,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
     const now = Date.now();
     return next.handle().pipe(
-      tap((data) =>
+      tap(() =>
         this.logger.log({
           request: request.body,
           // response: data,
