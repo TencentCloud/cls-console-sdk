@@ -2,7 +2,7 @@
   "name": "@tencent/cls-sdk-modules",
   "version": "0.1.12",
   "module": "./dist/bundle.esm.js",
-  "types": "./types/index.d.ts",
+  "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "types",

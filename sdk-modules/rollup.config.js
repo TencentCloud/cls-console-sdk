@@ -12,7 +12,12 @@ export default {
   plugins: [
     resolve(),
     commonjs(),
-    typescript({ tsconfig: './tsconfig.json', sourceMap: true, inlineSources: IS_DEV_ENVIRONMENT }),
+    typescript({
+      tsconfig: './tsconfig.json',
+      sourceMap: true,
+      inlineSources: IS_DEV_ENVIRONMENT,
+      declaration: true,
+    }),
     babel({
       presets: ['@babel/preset-react'],
       babelHelpers: 'bundled',
