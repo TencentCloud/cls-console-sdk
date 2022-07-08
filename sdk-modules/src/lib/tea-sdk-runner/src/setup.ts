@@ -91,8 +91,8 @@ export function setup({
   window['Insight'] = proxy();
   register({
     name: 'menus-sdk',
-    js: 'https://imgcache.qq.com/qcloud/tea/sdk/menus.zh.8162d4d61c.js?max_age=31536000',
-    css: 'https://imgcache.qq.com/qcloud/tea/sdk/menus.zh.d3f1d0ae0f.css?max_age=31536000',
+    js: 'https://imgcache.qq.com/qcloud/tea/sdk/menus.zh.9e13116d55.js?max_age=31536000',
+    css: 'https://imgcache.qq.com/qcloud/tea/sdk/menus.zh.765fcf341d.css?max_age=31536000',
   });
 
   sdks.forEach((sdk) => register(sdk));

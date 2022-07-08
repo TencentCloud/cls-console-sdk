@@ -1,13 +1,14 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { LoginCheck } from './LoginCheck';
-import { DashboardPage } from './Page/Dashboard';
-import { SearchPage } from './Page/Search';
 import './polyfill';
-import './utils/tea.css';
+import '@tencent/cls-sdk-modules/lib/tea.css';
 
-/** SDK外部调用样例，配合capi-forward实现控制台SDK复用 */
+import { LoginCheck } from './LoginCheck';
+import { DashboardPage } from './pages/Dashboard';
+import { SearchPage } from './pages/Search';
+
+/** SDK外部调用样例，配合 capi-forward 实现控制台SDK复用 */
 export default function App() {
   return (
     <LoginCheck>

@@ -1,7 +1,8 @@
-import { ISdkApi, ISdkDashboardPageControl, ISdkDashboardPageProps } from '@tencent/tea-sdk-cls-types';
-import { SDKLoader } from '@tencent/tea-sdk-runner';
 import React, { forwardRef } from 'react';
 import ReactDOM from 'react-dom';
+
+import { ISdkApi, ISdkDashboardPageControl, ISdkDashboardPageProps } from '@tencent/tea-sdk-cls-types';
+import { SDKLoader } from '@tencent/tea-sdk-runner';
 
 export const SdkDashboard = forwardRef((params: ISdkDashboardPageProps) => {
   if (!(window as any).TeaSDKRunner) {

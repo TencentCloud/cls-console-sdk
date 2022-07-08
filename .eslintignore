@@ -5,3 +5,4 @@ build
 ambient
 
 sdk-modules/src/lib
+sdk-modules/lib

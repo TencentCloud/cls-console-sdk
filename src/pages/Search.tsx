@@ -1,5 +1,5 @@
-import React, { useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useCallback, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { decode as base64urlDecode } from 'universal-base64url';
 
 import { SdkSearchPage } from '@tencent/cls-sdk-modules';
@@ -12,25 +12,10 @@ const __DEV__ = import.meta.env.DEV;
 export function SearchPage() {
   const searchPageControlRef = useRef<ISdkSearchPageControl>(null);
 
-  const navigate = useNavigate();
-  if (__DEV__) {
-    (window as any).sdkNavigate = navigate;
-  }
-
   // 初始值使用路由值。后续仅接受页面内数据修改，使用方可自行修改路由逻辑。此组件每次重渲染时，如有参数值变化，SDK内部路由将重新应用
   const [searchParams] = useSearchParams();
 
-  const pageParams: ISdkSearchPageProps['pageParams'] = {
-    region: searchParams.get('region'),
-    topicId: searchParams.get('topic_id'),
-    logsetName: searchParams.get('logset_name'),
-    topicName: searchParams.get('topic_name'),
-
-    query: searchParams.get('query') || base64urlDecode(searchParams.get('queryBase64') || ''),
-    time: (searchParams.get('time')?.split(',') as unknown as any) || null,
-    filter: searchParams.get('filter'),
-  } as any;
-
+  /** 页面隐藏参数信息 */
   const hideParams: ISdkSearchPageProps['hideParams'] = {
     hideTopicSelect: Boolean(searchParams.get('hideTopicSelect')),
     hideHeader: Boolean(searchParams.get('hideHeader')),
@@ -39,16 +24,41 @@ export function SearchPage() {
     hideLogDownload: Boolean(searchParams.get('hideLogDownload')),
   };
 
-  const onPageParamsUpdate = useCallback((params: ISdkSearchPageProps['pageParams']) => {
-    // 当前组件设计为内嵌方案，不进行浏览器路由同步。对于需要定制开发的用户，可自行处理 onPageParamsUpdate 逻辑
-    console.log('sdk params change: ', JSON.stringify(params));
-  }, []);
+  /** 传递给SDK组件的参数信息，每次变更时，SDK将执行参数内容的全量初始化 */
+  const [pageParams, setPageParams] = useState({
+    region: searchParams.get('region'),
+    topicId: searchParams.get('topic_id'),
+    logsetName: searchParams.get('logset_name'),
+    topicName: searchParams.get('topic_name'),
+
+    query: searchParams.get('query') || base64urlDecode(searchParams.get('queryBase64') || ''),
+    time: (searchParams.get('time')?.split(',') as unknown as any) || null,
+    filter: searchParams.get('filter'),
+  } as unknown as ISdkSearchPageProps['pageParams']);
+
+  /** 存储SDK内部的实时状态 */
+  const [innerPageParams, setInnerPageParams] = useState(pageParams);
+
+  /** 外部的行为逻辑入口，如需要在外部触发切换日志主题时进行调用 */
+  const triggerPageParamsChange = useCallback(
+    (params: Partial<ISdkSearchPageProps['pageParams']>) => {
+      setPageParams({
+        ...innerPageParams,
+        ...params,
+      });
+    },
+    [innerPageParams, setPageParams],
+  );
+  // triggerPageParamsChange({topicId:''})
+  (window as any).triggerPageParamsChange = triggerPageParamsChange;
 
   return (
     <div>
       {__DEV__ && (
         <div style={{ padding: 20, borderBottom: '1px solid black' }}>
           调试逻辑，完成调试后删除本段代码
+          <br />
+          pageParams 是当前传递给组件的参数，并非页面内的实时内容
           <p>
             {JSON.stringify({
               region: pageParams.region,
@@ -66,9 +76,13 @@ export function SearchPage() {
       <SdkSearchPage
         controlRef={searchPageControlRef}
         hideParams={hideParams}
+        /** pageParams 发生变更时，将会进行全量更新! */
         pageParams={pageParams}
-        onPageParamsUpdate={onPageParamsUpdate}
+        /** Sdk组件并非是纯受控组件，直接在回调中实时修改 pageParams 可能会导致时序问题 */
+        onPageParamsUpdate={setInnerPageParams}
       />
     </div>
   );
 }
+
+SearchPage.displayName = 'SearchConsoleSdk';

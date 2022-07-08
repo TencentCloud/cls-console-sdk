@@ -12,7 +12,12 @@ export default {
   plugins: [
     resolve(),
     commonjs(),
-    typescript({ tsconfig: '../tsconfig.json', sourceMap: IS_DEV_ENVIRONMENT, inlineSources: IS_DEV_ENVIRONMENT }),
+    typescript({
+      tsconfig: './tsconfig.json',
+      sourceMap: true,
+      inlineSources: IS_DEV_ENVIRONMENT,
+      declaration: true,
+    }),
     babel({
       presets: ['@babel/preset-react'],
       babelHelpers: 'bundled',
@@ -20,7 +25,7 @@ export default {
     }),
   ],
   output: {
-    file: 'dist/bundle.js',
+    file: 'dist/bundle.esm.js',
     format: 'esm',
     plugins: [
       getBabelOutputPlugin({

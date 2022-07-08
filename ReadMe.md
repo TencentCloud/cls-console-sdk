@@ -2,7 +2,7 @@
 
 本项目是基于 `sdk-modules` 文件夹，实现的 独立运行环境 快速体验样例。允许业务方将CLS控制台集成到自身页面，使用检索分析页面和仪表盘能力。
 
-为达成业务对权限管控和页面集成的相关诉求，需要进行前端页面嵌入 和 后端接入层转发 逻辑的开发工作，详情请参考 [独立运行环境接入文档](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/%E5%AE%9A%E5%88%B6%E5%8C%96%E5%BC%80%E5%8F%91.md)。
+为达成业务对权限管控和页面集成的相关诉求，需要进行前端页面嵌入 和 后端接入层转发 逻辑的开发工作，详情请参考 [独立运行环境接入文档](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/ReadMe.md)。
 
 
 
@@ -18,14 +18,22 @@
 # 环境变量区分大小写。secretId长度为36位，secretKey长度为32位。
 secretId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# 部署在内网环境时，设置为 true
+#internal=true
 # 设置后支持密码鉴权，不设置则无任何鉴权
 demoPassword=123456
+# 可配置为子路径，用于重用域名，格式如 /cls_sdk
+# 想要使用容器时开启此配置，需要在构建时也配置环境变量值, 具体方式参考部署项目中的子路径介绍
+#basePath=YOUR_BASE_PATH
 ```
 
 ## 部署项目
 ### 容器化运行方案
 > 从源码构建最新镜像版本 
 > `docker build . --tag=cls_web`
+> 
+> 如果需要使用子路径，在环境变量中加入参数，并使用参数 basePath 构建镜像, YOUR_BASE_PATH为设置的环境变量值
+> `docker build --build-arg basePath=YOUR_BASE_PATH . --tag=cls_web`
 > 
 > 运行容器
 > `docker run --env-file ./capi-forward/.env -p 3001:3001 cls_web`
