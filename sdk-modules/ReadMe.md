@@ -36,3 +36,9 @@
 5. 在业务使用方，主动引入 `sdk-modules/lib/tea.css` 文件（主要负责reset全局样式逻辑），缺少样式引入可能导致部分布局内容展示异常。
 
 6. 在业务使用方，主动引入`src/polyfill.ts`文件并安装`regenerator-runtime`依赖，缺少可能导致页面无法渲染。
+
+## 其他
+
+自定义开发时，实现 capi 方法可参考 `$projectRoot/src/utils/capi.ts` 文件内容。
+
+如果业务系统使用的是js代码，可考虑在仓库根目录执行 `tsc -p tsconfig-js.json` 命令，可在jsSrc文件夹中获取到源码的js版本内容，并修改引入到业务方代码中。
