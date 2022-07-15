@@ -86,8 +86,7 @@ export class AppController {
         exp.getTime() + EXPIRES_DAYS * 24 * 60 * 60 * 1000,
       );
       res.cookie('demo-token', capiPassword, {
-        sameSite: 'none',
-        secure: true,
+        sameSite: 'lax',
         expires: new Date(expires),
       });
       return {
