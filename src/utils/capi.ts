@@ -3,10 +3,8 @@ import { CAPIRequest } from '@tencent/cls-sdk-modules';
 import { REGIONIDMAP } from './constants';
 import { IApiError, IApiResponse } from './types';
 
-// 开发模式前后端分离，部署时直接使用nest进行部署
-const IS_DEV = Boolean(import.meta.env.DEV);
-const requestHost = IS_DEV ? 'http://127.0.0.1:3001' : '';
-const capiForwardUrl = (requestHost + import.meta.env.BASE_URL).slice(0, -1);
+const baseUrl = String(import.meta.env.BASE_URL);
+const capiForwardUrl = baseUrl.slice(0, -1);
 
 export async function GetForwardData(url = '/') {
   const response = await fetch(capiForwardUrl + url);
@@ -17,9 +15,9 @@ export async function postForwardData(url = '', data = {}) {
   // Default options are marked with *
   const response = await fetch(capiForwardUrl + url, {
     method: 'POST', // *GET, POST, PUT, DELETE, etc.
-    mode: 'cors', // no-cors, *cors, same-origin
+    mode: 'same-origin', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: IS_DEV ? 'include' : 'same-origin', // include, *same-origin, omit
+    credentials: 'same-origin', // include, *same-origin, omit
     headers: {
       'Content-Type': 'application/json',
     },
@@ -33,7 +31,7 @@ export async function postForwardData(url = '', data = {}) {
 export async function getForwardData(url = '', data = '') {
   const response = await fetch(`${capiForwardUrl + url}${data ? `?${data}` : ''}`, {
     method: 'GET', // *GET, POST, PUT, DELETE, etc.
-    credentials: 'include',
+    credentials: 'same-origin',
   });
   return response.json(); // parses JSON response into native JavaScript objects
 }
