@@ -4,6 +4,7 @@ import { setup } from '@tencent/tea-sdk-runner';
 import { SDKRunnerSetupOptions } from '@tencent/tea-sdk-runner/lib/type';
 
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
+window.moment = moment;
 
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
@@ -28,9 +29,6 @@ export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | '
   /** @internal 使用特定的用户身份信息，测试专用 */
   loginInfo?: Partial<LoginInfo>;
 }
-
-window.moment = moment;
-(window as any).QCMAIN_HOST = 'cloud.tencent.com';
 
 export async function initSdkRunner(params: ClsSdkInitParams) {
   const {
@@ -69,6 +67,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     loginInfo.loginUin = userIdInfo.Uin;
   }
 
+  (window as any).QCMAIN_HOST = Number(loginInfo?.area) === 2 ? 'tencentcloud.com' : 'cloud.tencent.com';
   setup({
     requireRegionData: true,
     sdks: [
