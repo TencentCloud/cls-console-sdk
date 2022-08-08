@@ -7,6 +7,16 @@ import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils
 
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
+export interface LoginInfo {
+  appId: number;
+  loginUin: string;
+  ownerUin: string;
+  area: 1 | 2; // 1国内站 2国际站，同时决定语言
+  countryCode?: '86';
+  countryName?: 'CN';
+  identity?: any;
+}
+
 export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | 'requireRegionData' | 'loginInfo'> {
   /** 重要：需要将页面发出的请求内容，转发到腾讯云接口 */
   capi: SDKRunnerSetupOptions['capi'];
@@ -16,11 +26,7 @@ export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | '
     css: string;
   };
   /** @internal 使用特定的用户身份信息，测试专用 */
-  userIdentity?: {
-    AppId: number;
-    OwnerUin: string;
-    Uin: string;
-  };
+  loginInfo?: Partial<LoginInfo>;
 }
 
 window.moment = moment;
@@ -34,7 +40,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.a13a0c0794.js?max_age=31536000',
       // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.1f6e5e1bd7.css?max_age=31536000',
     } as any,
-    userIdentity = {} as any,
+    loginInfo = {} as unknown as ClsSdkInitParams['loginInfo'],
   } = params;
 
   if (!capi) {
@@ -43,7 +49,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
 
   // 加载SDK最新版本号
   if (!(config.js && config.css)) {
-    const { Results } = await GetConsoleConfigVersion(capi);
+    const Results = await GetConsoleConfigVersion(capi, loginInfo.area === 2);
     if (Results?.length) {
       config.js = Results[0]?.Url ?? '';
       config.css = Results[0]?.CSS?.[0] ?? '';
@@ -56,11 +62,11 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
   }
 
   // 加载用户ID信息
-  if (!(userIdentity.AppId && userIdentity.OwnerUin && userIdentity.Uin)) {
-    const loginInfo = await GetUserAppId(capi);
-    userIdentity.AppId = loginInfo.AppId;
-    userIdentity.OwnerUin = loginInfo.OwnerUin;
-    userIdentity.Uin = loginInfo.Uin;
+  if (!(loginInfo.appId && loginInfo.ownerUin && loginInfo.loginUin)) {
+    const userIdInfo = await GetUserAppId(capi);
+    loginInfo.appId = userIdInfo.AppId;
+    loginInfo.ownerUin = userIdInfo.OwnerUin;
+    loginInfo.loginUin = userIdInfo.Uin;
   }
 
   setup({
@@ -76,13 +82,10 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     // 云 API 调用代理
     capi,
     loginInfo: {
-      area: null,
       countryCode: '86',
       countryName: 'CN',
       identity: {},
-      appId: userIdentity.AppId,
-      loginUin: userIdentity.Uin,
-      ownerUin: userIdentity.OwnerUin,
+      ...loginInfo,
     },
   });
 }
@@ -104,9 +107,11 @@ async function GetUserAppId(capi: SDKRunnerSetupOptions['capi']): Promise<{
   return res.Response;
 }
 
-async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Promise<{
-  Total: number;
-  Results: {
+async function GetConsoleConfigVersion(
+  capi: SDKRunnerSetupOptions['capi'],
+  isI18n?: boolean,
+): Promise<
+  {
     Date: string;
     Site: number;
     Lang: string;
@@ -115,10 +120,27 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
     Feature: string;
     Type: string;
     CSS: string;
-  }[];
-  RequestId: string;
-}> {
-  const res = await capi({
+  }[]
+> {
+  const {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    Response: { Results },
+  }: {
+    Response: {
+      Total: number;
+      Results: {
+        Date: string;
+        Site: number;
+        Lang: string;
+        Route: string;
+        Url: string;
+        Feature: string;
+        Type: string;
+        CSS: string;
+      }[];
+      RequestId: string;
+    };
+  } = await capi({
     regionId: 1,
     serviceType: 'console',
     cmd: 'DescribeConsoleConfigVersion',
@@ -130,11 +152,10 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
         {
           Route: 'cls-sdk',
           Type: 'product.sdk',
-          Lang: 'zh',
           Site: 0,
         },
       ],
     },
   });
-  return res.Response;
+  return Results.filter((item) => (!isI18n ? item.Lang === 'zh' : item.Lang !== 'zh'));
 }
