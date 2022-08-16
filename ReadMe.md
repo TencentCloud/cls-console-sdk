@@ -40,6 +40,7 @@ demoPassword=123456
 
 
 ### Node.js 运行方案
+> Node 版本要求最低 14， 最佳实践为 16，因为使用了某些高级语法，旧版本 Node 不支持。 
 1. 使用 pnpm 安装依赖。
 > 如未使用 pnpm，请先 [安装](https://pnpm.io/zh/installation) 。
 >
