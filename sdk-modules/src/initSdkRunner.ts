@@ -67,7 +67,8 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     loginInfo.loginUin = userIdInfo.Uin;
   }
 
-  (window as any).QCMAIN_HOST = Number(loginInfo?.area) === 2 ? 'tencentcloud.com' : 'cloud.tencent.com';
+  initQcHost(loginInfo);
+
   setup({
     requireRegionData: true,
     sdks: [
@@ -87,6 +88,19 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       ...loginInfo,
     },
   });
+}
+
+// 设置全局Host变量
+function initQcHost(loginInfo: ClsSdkInitParams['loginInfo']) {
+  const isInternational = Number(loginInfo?.area) === 2;
+
+  const QCMAIN_HOST = !isInternational ? 'cloud.tencent.com' : 'www.tencentcloud.com';
+  (window as any).QCMAIN_HOST = QCMAIN_HOST;
+  (window as any).QCCDN_HOST = !isInternational ? 'cloudcache.tencent-cloud.cn' : 'cloudcache.tencent-cloud.com';
+
+  (window as any).QCCONSOLE_HOST = `console.${QCMAIN_HOST}`;
+  (window as any).QCBASE_HOST = `iaas.${QCMAIN_HOST}`;
+  (window as any).QCBUY_HOST = `bug.${QCMAIN_HOST}`;
 }
 
 async function GetUserAppId(capi: SDKRunnerSetupOptions['capi']): Promise<{
