@@ -3,8 +3,7 @@ import { CAPIRequest } from '@tencent/cls-sdk-modules';
 import { REGIONIDMAP } from './constants';
 import { IApiError, IApiResponse } from './types';
 
-const baseUrl = String(import.meta.env.BASE_URL);
-const capiForwardUrl = baseUrl.slice(0, -1);
+const capiForwardUrl = '/clsApi';
 
 export async function GetForwardData(url = '/') {
   const response = await fetch(capiForwardUrl + url);

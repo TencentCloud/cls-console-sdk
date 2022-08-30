@@ -22,18 +22,12 @@ secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #internal=true
 # 设置后支持密码鉴权，不设置则无任何鉴权
 demoPassword=123456
-# 可配置为子路径，用于重用域名，格式如 /cls_sdk
-# 想要使用容器时开启此配置，需要在构建时也配置环境变量值, 具体方式参考部署项目中的子路径介绍
-#basePath=YOUR_BASE_PATH
 ```
 
 ## 部署项目
 ### 容器化运行方案
 > 从源码构建最新镜像版本 
 > `docker build . --tag=cls_web`
-> 
-> 如果需要使用子路径，在环境变量中加入参数，并使用参数 basePath 构建镜像, YOUR_BASE_PATH为设置的环境变量值
-> `docker build --build-arg basePath=YOUR_BASE_PATH . --tag=cls_web`
 > 
 > 运行容器
 > `docker run --env-file ./capi-forward/.env -p 3001:3001 cls_web`
@@ -46,7 +40,7 @@ demoPassword=123456
 >
 > 在项目根目录执行 `pnpm install -r` 命令安装依赖。
 > 
-> 如遇到安装出错，请在项目根目录运行 `find . -name "node_modules" -type d -exec rm -rf '{}' +` 命令后重新进行安装。 
+> 如遇到安装出错，请在项目根目录运行 `find . -name "node_modules" -type d -exec rm -rf '{}' +` 命令后重新进行安装。
 
 2. 项目构建与运行
 > 在项目根目录运行 `npm run build` 完成项目构建。
@@ -58,17 +52,17 @@ demoPassword=123456
 
 ## SDK控制台使用
 ### 浏览器直接访问
-完成项目运行后，可在浏览器中打开相应页面。
+完成项目运行后，可在浏览器中打开相应页面。路径地址和参数格式，与控制台保持一致
 
 ```url
 # 检索分析页面：将以下网址中的 ${Region} 和 ${TopicId}，替换为对应的地域和日志主题ID，即可访问。${Query}为检索语句，可以为空。
-http://localhost:3001/search?region=${Region}&topic_id=${TopicId}&query=${Query}&time=now-h,now
+http://localhost:3001/cls/search?region=${Region}&topic_id=${TopicId}&query=${Query}&time=now-h,now
 
 # 检索分析页面: 将以下网址中的 ${Region} ${logset_name} ${topic_name}，替换为对应的地域、日志集名称、日志主题名称，即可访问。
-http://localhost:3001/search?region=${Region}&topic_name=${TopicName}&logset_name=${LogsetName}
+http://localhost:3001/cls/search?region=${Region}&topic_name=${TopicName}&logset_name=${LogsetName}
 
 # 仪表盘页面：将以下网址中的 ${dashboardId} 替换为仪表盘ID，即可访问。
-http://localhost:3001/dashboard?id=${dashboardId}&time=now-7d,now
+http://localhost:3001/cls/dashboard/d?id=${dashboardId}&time=now-7d,now
 ```
 地域参数格式为`ap-shanghai`, 检索页面参数设置请参考[检索页面参数设置](https://cloud.tencent.com/document/product/614/39331)
 
@@ -84,7 +78,7 @@ function prepareSdkFrame(url) {
    ifrm.style.height = "960px";
    document.body.appendChild(ifrm);
 }
-const url = 'http://localhost:3001/search?region=${Region}&topic_id=${TopicId}&query=${Query}&time=now-h,now'
+const url = 'http://localhost:3001/cls/search?region=${Region}&topic_id=${TopicId}&query=${Query}&time=now-h,now'
 
 prepareSdkFrame(url)
 ```

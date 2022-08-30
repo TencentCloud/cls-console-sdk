@@ -15,7 +15,4 @@ export default () => ({
   capiPassword: process.env.demoPassword
     ? bcryptjs.hashSync(process.env.demoPassword, 10)
     : '',
-
-  /** 此参数通过调用函数直接获取, 用于 Controller 和 前端BASE_URL，未经过 ConfigService */
-  basePath: process.env.basePath ?? '/',
 });

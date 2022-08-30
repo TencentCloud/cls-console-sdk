@@ -6,8 +6,7 @@
     "preinstall": "npx only-allow pnpm",
     "devPrepare": "pnpm recursive install",
     "dev": "env-cmd -f ./capi-forward/.env vite --port 8080",
-    "build": "env-cmd -f ./capi-forward/.env npm run buildWithoutEnv",
-    "buildWithoutEnv": "npm run build:frontend && npm run build:backend",
+    "build": "npm run build:frontend && npm run build:backend",
     "build:frontend": "tsc && vite build",
     "build:backend": "cd ./capi-forward && npm run build",
     "serve": "pm2 start ./capi-forward/dist/main.js"

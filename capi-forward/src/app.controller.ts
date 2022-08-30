@@ -3,9 +3,8 @@ import { Response, Request } from 'express';
 import * as bcryptjs from 'bcryptjs';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
-import configuration from './config/configuration';
 
-@Controller(configuration().basePath)
+@Controller('/clsApi')
 export class AppController {
   constructor(
     private readonly appService: AppService,

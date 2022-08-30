@@ -20,8 +20,7 @@ import configuration from './config/configuration';
     ServeStaticModule.forRoot({
       // 二级父目录dist文件夹内容为 前端项目构建产物
       rootPath: join(__dirname, '../..', 'dist'),
-      exclude: ['test', '/capi/**', '/user/**'],
-      serveRoot: configuration().basePath,
+      renderPath: /|\/cls\/\w+/,
     }),
   ],
   controllers: [AppController],

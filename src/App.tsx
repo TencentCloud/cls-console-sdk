@@ -18,8 +18,8 @@ export default function App() {
           {(window as any).TeaSDKRunner && (
             <Routes>
               <Route path={'/'} element={<SearchPage />} />
-              <Route path={'/search'} element={<SearchPage />} />
-              <Route path={'/dashboard'} element={<DashboardPage />} />
+              <Route path={'/cls/search'} element={<SearchPage />} />
+              <Route path={'/cls/dashboard/d'} element={<DashboardPage />} />
             </Routes>
           )}
         </div>
