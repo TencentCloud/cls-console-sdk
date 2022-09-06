@@ -1,10 +1,14 @@
 import moment from 'moment';
+import 'moment/dist/locale/zh-cn';
+import 'moment/dist/locale/ko';
+import 'moment/dist/locale/ja';
 
 import { setup } from '@tencent/tea-sdk-runner';
 import { SDKRunnerSetupOptions } from '@tencent/tea-sdk-runner/lib/type';
 
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
 window.moment = moment;
+moment.locale('zh-cn');
 
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
@@ -58,6 +62,8 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       config.css = version.css;
     }
   }
+  // 设置Moment语言版本
+  moment.locale(loginInfo.area === 2 ? 'en' : 'zh-cn');
 
   // 加载用户ID信息
   if (!(loginInfo.appId && loginInfo.ownerUin && loginInfo.loginUin)) {

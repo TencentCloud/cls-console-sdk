@@ -12,7 +12,8 @@ npm run dev
 配置whistle规则
 
 ```whistle
-clsiframe.com/user http://localhost:3001/user
-clsiframe.com/forward http://localhost:3001/forward
-clsiframe.com http://localhost:8080/
+# CLS 外部SDK
+clsiframe.com/clsApi/user http://localhost:3001/clsApi/user
+clsiframe.com/clsApi/forward http://localhost:3001/clsApi/forward
+clsiframe.com http://localhost:8080
 ```
