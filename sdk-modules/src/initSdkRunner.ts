@@ -1,12 +1,9 @@
-import moment from 'moment';
-import 'moment/dist/locale/zh-cn';
-import 'moment/dist/locale/ko';
-import 'moment/dist/locale/ja';
-
 import { setup } from '@tencent/tea-sdk-runner';
 import { SDKRunnerSetupOptions } from '@tencent/tea-sdk-runner/lib/type';
 
+import moment from './lib/moment';
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
+
 window.moment = moment;
 moment.locale('zh-cn');
 

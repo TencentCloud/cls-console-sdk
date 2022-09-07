@@ -17,6 +17,7 @@
     "core-js": "3.21.1",
     "dotenv": "^16.0.1",
     "env-cmd": "^10.1.0",
+    "moment": "^2.29.4",
     "pm2": "^5.2.0",
     "react": "^17.0.2",
     "react-bootstrap": "^2.2.3",
@@ -60,7 +61,7 @@
       "git add"
     ]
   },
-  "engines" : {
-    "node" : ">14"
+  "engines": {
+    "node": ">14"
   }
 }

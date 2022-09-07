@@ -23,7 +23,7 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "paths": {
-      "@tencent/cls-sdk-modules": ["./sdk-modules/src"],
+      "@tencent/cls-sdk-modules": ["./sdk-modules"],
       "@tencent/cls-sdk-modules/lib/*": ["./sdk-modules/lib/*"],
       "@tencent/tea-sdk-cls-types": ["./sdk-modules/src/lib/tea-sdk-cls-types/types/src/sdk"],
       "@tencent/tea-sdk-runner": ["./sdk-modules/src/lib/tea-sdk-runner/src"],

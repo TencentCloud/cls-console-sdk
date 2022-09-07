@@ -33,5 +33,5 @@ export default {
       }),
     ],
   },
-  external: ['react', 'react-dom'],
+  external: ['react', 'react-dom', 'react-router-dom', 'moment'],
 };
