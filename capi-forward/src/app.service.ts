@@ -82,8 +82,10 @@ export class AppService {
   }: IApiRequestParams): Promise<ResponseData> {
     const clientConfig = this.clientConfig;
     const { profile, credential } = clientConfig;
+
+    const serviceName = String(service).replace(/[^0-9a-zA-Z]/g, '');
     let res;
-    const endpoint = service + clientConfig.other.endpointSuffix;
+    const endpoint = serviceName + clientConfig.other.endpointSuffix;
     const url =
       profile.httpProfile.protocol + endpoint + clientConfig.other.path;
     try {
@@ -91,7 +93,7 @@ export class AppService {
         region: region,
         data: data || '',
         action: action,
-        service: service,
+        service: serviceName,
         version: version,
 
         method: profile.httpProfile.reqMethod,
