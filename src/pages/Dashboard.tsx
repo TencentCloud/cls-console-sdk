@@ -1,14 +1,13 @@
+import { ISdkDashboardPageControl, renderSdkDashboard } from '@tencent/cls-sdk-modules';
 import React, { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ISdkDashboardPageControl, renderSdkDashboard } from '@tencent/cls-sdk-modules';
 
 export function DashboardPage() {
   const dashboardPageControlRef = useRef<ISdkDashboardPageControl | null>(null as any);
 
   const [searchParams] = useSearchParams();
-  const params = Object.fromEntries(searchParams.entries());
 
   // return <SdkDashboard controlRef={dashboardPageControlRef} pageParams={{ id: '' }} />;
 
@@ -18,11 +17,12 @@ export function DashboardPage() {
     if (ele) {
       const hideParams: any = {};
       const pageParams: any = {};
-      Object.keys(params).forEach((key) => {
+      Array.from(searchParams.keys()).forEach((key) => {
         if (key.startsWith('hide')) {
-          hideParams[key] = params[key];
+          hideParams[key] = searchParams.get(key);
         } else {
-          pageParams[key] = params[key];
+          const paramValue = searchParams.getAll(key);
+          pageParams[key] = paramValue?.length ? paramValue : paramValue[0];
         }
       });
       const { controlRef, destroy } = renderSdkDashboard(
@@ -38,6 +38,6 @@ export function DashboardPage() {
         destroy?.();
       };
     }
-  }, [params]);
+  }, [searchParams]);
   return <div id={domId} />;
 }
