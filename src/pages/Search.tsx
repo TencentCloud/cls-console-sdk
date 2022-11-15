@@ -53,7 +53,7 @@ export function SearchPage() {
   (window as any).triggerPageParamsChange = triggerPageParamsChange;
 
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       {__DEV__ && (
         <div style={{ padding: 20, borderBottom: '1px solid black' }}>
           调试逻辑，完成调试后删除本段代码

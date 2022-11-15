@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 
 import './polyfill';
 import '@tencent/cls-sdk-modules/lib/tea.css';
@@ -14,12 +14,13 @@ export default function App() {
     <LoginCheck>
       {() => (
         //  这里使用定高，包装组件内部的滚动逻辑
-        <div id="cls">
+        <div id="cls" style={{ height: "100%" }}>
           {(window as any).TeaSDKRunner && (
             <Routes>
               <Route path={'/'} element={<SearchPage />} />
               <Route path={'/cls/search'} element={<SearchPage />} />
               <Route path={'/cls/dashboard/d'} element={<DashboardPage />} />
+              <Route path="*" element={<Navigate to="/cls/search" replace />} />
             </Routes>
           )}
         </div>
