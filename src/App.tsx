@@ -14,7 +14,7 @@ export default function App() {
     <LoginCheck>
       {() => (
         //  这里使用定高，包装组件内部的滚动逻辑
-        <div id="cls" style={{ height: "100%" }}>
+        <div id="cls" style={{ height: '100%' }}>
           {(window as any).TeaSDKRunner && (
             <Routes>
               <Route path={'/'} element={<SearchPage />} />
