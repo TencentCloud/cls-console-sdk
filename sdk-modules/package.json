@@ -1,6 +1,6 @@
 {
   "name": "@tencent/cls-sdk-modules",
-  "version": "0.1.19",
+  "version": "0.1.21",
   "module": "./dist/bundle.esm.js",
   "types": "./types/index.d.ts",
   "files": [
