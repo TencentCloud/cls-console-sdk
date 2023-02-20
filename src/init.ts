@@ -37,14 +37,14 @@ async function Login(pwd): Promise<IApiResponse> {
   try {
     const response = await postForwardData('/user/login', { pwd });
     if (response?.code) {
-      console.log('LoginForward Error: ', response);
+      console.error('LoginForward Error: ', response);
       return Promise.reject(response);
     }
 
     // console.log('CApiForward Response: ', response);
     return response.data;
   } catch (e) {
-    console.log('CApiForward Error: ', e);
+    console.error('CApiForward Error: ', e);
     return Promise.reject(e);
   }
 }

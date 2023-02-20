@@ -96,14 +96,13 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
 // 设置全局Host变量
 function initQcHost(loginInfo: ClsSdkInitParams['loginInfo']) {
   const isInternational = Number(loginInfo?.area) === 2;
-
-  const QCMAIN_HOST = !isInternational ? 'cloud.tencent.com' : 'www.tencentcloud.com';
-  (window as any).QCMAIN_HOST = QCMAIN_HOST;
-  (window as any).QCCDN_HOST = !isInternational ? 'cloudcache.tencent-cloud.cn' : 'cloudcache.tencent-cloud.com';
-
-  (window as any).QCCONSOLE_HOST = `console.${QCMAIN_HOST}`;
-  (window as any).QCBASE_HOST = `iaas.${QCMAIN_HOST}`;
-  (window as any).QCBUY_HOST = `bug.${QCMAIN_HOST}`;
+  const QCLOUD_ROOT_HOST = !isInternational ? 'cloud.tencent.com' : 'tencentcloud.com';
+  (window as any).QCLOUD_ROOT_HOST = QCLOUD_ROOT_HOST;
+  (window as any).QCMAIN_HOST = !isInternational ? 'cloud.tencent.com' : 'www.tencentcloud.com';
+  (window as any).QCCDN_HOST = 'cloudcache.tencent-cloud.com';
+  (window as any).QCCONSOLE_HOST = `console.${QCLOUD_ROOT_HOST}`;
+  (window as any).QCBASE_HOST = `iaas.${QCLOUD_ROOT_HOST}`;
+  (window as any).QCBUY_HOST = `buy.${QCLOUD_ROOT_HOST}`;
 }
 
 async function GetUserAppId(capi: SDKRunnerSetupOptions['capi']): Promise<{

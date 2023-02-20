@@ -58,7 +58,7 @@ export const CApiForward: CAPIRequest = async function (body): Promise<IApiRespo
     const response = await postForwardData('/forward', param);
     if (response?.Response?.Error) {
       const err = response?.Response?.Error;
-      // console.log('CApiForward Error: ', response);
+      // console.error('CApiForward Error: ', response);
       return Promise.reject({
         code: err.Code,
         name: err.Code,
@@ -69,7 +69,7 @@ export const CApiForward: CAPIRequest = async function (body): Promise<IApiRespo
 
     return response;
   } catch (e) {
-    console.log('CApiForward Error: ', e);
+    console.error('CApiForward Error: ', e);
     return Promise.reject(e);
   }
 };
