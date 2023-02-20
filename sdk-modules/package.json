@@ -1,6 +1,6 @@
 {
   "name": "@tencent/cls-sdk-modules",
-  "version": "0.1.22",
+  "version": "0.1.24",
   "module": "./dist/bundle.esm.js",
   "types": "./types/index.d.ts",
   "files": [
@@ -14,7 +14,7 @@
     "build": "npm run build:rollup && npm run build:types",
     "build:rollup": "rollup -c ./rollup.config.js -m && tsc",
     "build:types": "tsc --noEmit false --declaration --emitDeclarationOnly --outDir ./types",
-    "publishVersion": "npm version patch && tnpm publish"
+    "publishVersion": "npm run build:rollup && npm version patch && npm --registry \"https://mirrors.tencent.com/npm/\" publish"
   },
   "dependencies": {
     "clipboard": "^2.0.10",
