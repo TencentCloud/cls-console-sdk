@@ -2,9 +2,10 @@ import React, { forwardRef } from 'react';
 import ReactDOM from 'react-dom';
 
 import { ISdkApi, ISdkSearchPageControl, ISdkSearchPageProps } from '@tencent/tea-sdk-cls-types';
-import { SDKLoader } from '@tencent/tea-sdk-runner';
 
-export const SdkSearchPage = forwardRef((params: ISdkSearchPageProps) => {
+import { SDKLoader } from './lib/tea-sdk-runner/src';
+
+export const SdkSearchPage = forwardRef((params: ISdkSearchPageProps, ref) => {
   if (!(window as any).TeaSDKRunner) {
     return <div>sdk未初始化</div>;
   }
@@ -13,7 +14,7 @@ export const SdkSearchPage = forwardRef((params: ISdkSearchPageProps) => {
       {(sdks) => {
         const clsSdk: ISdkApi = sdks[0];
         const { SearchPageComponent } = clsSdk.SearchPage;
-        return <SearchPageComponent {...params} />;
+        return <SearchPageComponent ref={ref} {...params} />;
       }}
     </SDKLoader>
   );

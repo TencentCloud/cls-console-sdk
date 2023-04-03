@@ -27,11 +27,9 @@
     "strictNullChecks": false,
     "noImplicitAny": false,
     "paths": {
-      "@tencent/tea-sdk-runner": ["./src/lib/tea-sdk-runner/src"],
-      "@tencent/tea-sdk-runner/lib/*": ["./src/lib/tea-sdk-runner/src/*"],
       "@tencent/tea-sdk-cls-types": ["./src/lib/tea-sdk-cls-types/types/src/sdk"]
     }
   },
   "include": ["./**/*.ts", "./**/*.js", "./**/*.tsx", "./**/*.jsx", "./**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "types", "lib"]
+  "exclude": ["node_modules", "dist", "types"]
 }

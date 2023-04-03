@@ -2,9 +2,10 @@ import React, { forwardRef } from 'react';
 import ReactDOM from 'react-dom';
 
 import { ISdkApi, ISdkDashboardPageControl, ISdkDashboardPageProps } from '@tencent/tea-sdk-cls-types';
-import { SDKLoader } from '@tencent/tea-sdk-runner';
 
-export const SdkDashboard = forwardRef((params: ISdkDashboardPageProps) => {
+import { SDKLoader } from './lib/tea-sdk-runner/src';
+
+export const SdkDashboard = forwardRef((params: ISdkDashboardPageProps, ref) => {
   if (!(window as any).TeaSDKRunner) {
     return <div>sdk未初始化</div>;
   }
@@ -13,7 +14,7 @@ export const SdkDashboard = forwardRef((params: ISdkDashboardPageProps) => {
       {(sdks) => {
         const clsSdk: ISdkApi = sdks[0];
         const { DashboardPageComponent } = clsSdk.DashboardPage;
-        return <DashboardPageComponent {...params} />;
+        return <DashboardPageComponent ref={ref} {...params} />;
       }}
     </SDKLoader>
   );

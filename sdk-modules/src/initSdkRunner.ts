@@ -1,7 +1,8 @@
-import { setup } from '@tencent/tea-sdk-runner';
-import { SDKRunnerSetupOptions } from '@tencent/tea-sdk-runner/lib/type';
+import type { History } from 'history';
 
 import moment from './lib/moment';
+import { setup } from './lib/tea-sdk-runner/src';
+import { SDKRunnerSetupOptions } from './lib/tea-sdk-runner/src/type';
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
 
 window.moment = moment;
@@ -29,6 +30,8 @@ export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | '
   };
   /** @internal 使用特定的用户身份信息，测试专用 */
   loginInfo?: Partial<LoginInfo>;
+
+  history?: History;
 }
 
 export async function initSdkRunner(params: ClsSdkInitParams) {
@@ -39,19 +42,45 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.a13a0c0794.js?max_age=31536000',
       // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.1f6e5e1bd7.css?max_age=31536000',
     } as any,
-    loginInfo = {} as unknown as ClsSdkInitParams['loginInfo'],
+    loginInfo = {},
+    history,
   } = params;
 
   if (!capi) {
     return Promise.reject('init params error!');
   }
 
+  // 加载用户ID信息
+  if (!(loginInfo?.appId && loginInfo?.ownerUin && loginInfo?.loginUin)) {
+    const userIdInfo = await GetUserAppId(capi);
+    loginInfo.appId = userIdInfo.AppId;
+    loginInfo.ownerUin = userIdInfo.OwnerUin;
+    loginInfo.loginUin = userIdInfo.Uin;
+  }
+
   // 加载SDK最新版本号
+  const configVersionResult = await GetConsoleConfigVersion(capi, loginInfo.area === 2);
+  const sdkConfigs: { [key: string]: { js: string; css: string } } = {};
+  configVersionResult.forEach((config) => {
+    const sdkName = config.Route;
+    if (sdkConfigs[sdkName]) {
+      return;
+    }
+    const sdkConfig = configVersionResult
+      .filter((item) => item.Route === sdkName && item.Site <= 1)
+      .sort((a, b) => a.Site - b.Site)
+      .pop(); // 优先取 Site === 1 中国站单独配置，否则取 Site === 0 不分站点配置
+
+    sdkConfigs[sdkName] = {
+      js: sdkConfig.Url,
+      css: sdkConfig.CSS,
+    };
+  });
+
   if (!(config.js && config.css)) {
-    const Results = await GetConsoleConfigVersion(capi, loginInfo.area === 2);
-    if (Results?.length) {
-      config.js = Results[0]?.Url ?? '';
-      config.css = Results[0]?.CSS?.[0] ?? '';
+    if (sdkConfigs['cls-sdk']?.js) {
+      config.js = sdkConfigs['cls-sdk'].js;
+      config.css = sdkConfigs['cls-sdk'].css;
       setLocalStorageItem(CLS_SDK_VERSION, JSON.stringify(config));
     } else {
       const version = safeJsonParse(getLocalStorageItem(CLS_SDK_VERSION));
@@ -59,22 +88,20 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       config.css = version.css;
     }
   }
+
   // 设置Moment语言版本
   moment.locale(loginInfo.area === 2 ? 'en' : 'zh-cn');
-
-  // 加载用户ID信息
-  if (!(loginInfo.appId && loginInfo.ownerUin && loginInfo.loginUin)) {
-    const userIdInfo = await GetUserAppId(capi);
-    loginInfo.appId = userIdInfo.AppId;
-    loginInfo.ownerUin = userIdInfo.OwnerUin;
-    loginInfo.loginUin = userIdInfo.Uin;
-  }
 
   initQcHost(loginInfo);
 
   setup({
     requireRegionData: true,
     sdks: [
+      ...Object.keys(sdkConfigs).map((sdkName) => ({
+        name: sdkName,
+        js: sdkConfigs[sdkName].js,
+        css: sdkConfigs[sdkName].css,
+      })),
       {
         name: 'cls-sdk',
         js: config.js,
@@ -90,6 +117,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       identity: {},
       ...loginInfo,
     },
+    history,
   });
 }
 
@@ -161,13 +189,50 @@ async function GetConsoleConfigVersion(
     cmd: 'DescribeConsoleConfigVersion',
     data: {
       Version: '2022-02-15',
-      Limit: 20,
+      Limit: 100,
       Offset: 0,
       Queries: [
         {
           Route: 'cls-sdk',
           Type: 'product.sdk',
-          Site: 0,
+          // Site: 1,
+          Lang: 'zh',
+        },
+        {
+          Route: 'tag-sdk',
+          Type: 'product.sdk',
+          // Site: 1,
+          Lang: 'zh',
+        },
+        {
+          Route: 'cam-sdk',
+          Type: 'product.sdk',
+          // Site: 1,
+          Lang: 'zh',
+        },
+        {
+          Route: 'menus-sdk',
+          Type: 'product.sdk',
+          // Site: 1,
+          Lang: 'zh',
+        },
+        {
+          Route: 'nps-service-sdk',
+          Type: 'product.sdk',
+          // Site: 1,
+          Lang: 'zh',
+        },
+        {
+          Route: 'help-sdk',
+          Type: 'product.sdk',
+          // Site: 1,
+          Lang: 'zh',
+        },
+        {
+          Route: 'monitor-v2-sdk',
+          Type: 'product.sdk',
+          // Site: 1,
+          Lang: 'zh',
         },
       ],
     },
