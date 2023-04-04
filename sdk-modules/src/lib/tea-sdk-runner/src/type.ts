@@ -1,4 +1,5 @@
 import { CAPIRequest } from "./modules/capi";
+import type { History } from 'history';
 
 export interface SDKRunnerSDKEntry {
   /**
@@ -14,7 +15,7 @@ export interface SDKRunnerSDKEntry {
   /**
    * SDK 对应 CSS URL
    */
-  css?: string;
+  css?: string | [string];
 }
 
 export interface SDKRunnerEnvModules {
@@ -46,4 +47,6 @@ export interface SDKRunnerSetupOptions {
    * 需要获取地域信息
    */
   requireRegionData?: boolean;
+
+  history?: History;
 }

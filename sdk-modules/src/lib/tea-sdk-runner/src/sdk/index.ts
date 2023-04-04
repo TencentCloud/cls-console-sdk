@@ -11,7 +11,7 @@ function getSDKEntry(name: string) {
 }
 
 export function initSDKImporter({ requireRegionData }) {
-  window.define("nmc/sdk/sdk", function (require, exports, module) {
+  const sdk = function (require, exports, module) {
     exports.use = function (sdkName: string) {
       const config = getSDKEntry(sdkName);
       return new Promise((resolve, reject) => {
@@ -21,8 +21,8 @@ export function initSDKImporter({ requireRegionData }) {
 
         const js = config.js;
         const css = (Array.isArray(config.css)
-          ? config.css
-          : [config.css]
+            ? config.css
+            : [config.css]
         ).filter(Boolean);
 
         var failTimer = setTimeout(function () {
@@ -43,7 +43,9 @@ export function initSDKImporter({ requireRegionData }) {
         });
       });
     };
-  });
+  }
+  window.define("nmc/sdk/sdk", sdk);
+  window.define("sdk", sdk);
 }
 
 export { use } from "./use";

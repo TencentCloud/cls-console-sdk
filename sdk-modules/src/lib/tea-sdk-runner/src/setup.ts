@@ -10,6 +10,8 @@ import { tipsModules } from './modules/tips';
 import { appUtilModules } from './modules/appUtil';
 import { utilModules } from './modules/util';
 import { ClipboardJs } from './modules/clipboard';
+import { getManagerModules } from './modules/manager';
+import { getRouterModules } from './modules/router';
 
 /**
  * 准备 Seajs 环境
@@ -85,15 +87,11 @@ export function setup({
   modules = {},
   loginInfo,
   requireRegionData,
+  history
 }: SDKRunnerSetupOptions) {
   // tips 包含在 menus 中
   window['g_buffet_data'] = proxy({ menuRouter: {} });
   window['Insight'] = proxy();
-  register({
-    name: 'menus-sdk',
-    js: 'https://imgcache.qq.com/qcloud/tea/sdk/menus.zh.9e13116d55.js?max_age=31536000',
-    css: 'https://imgcache.qq.com/qcloud/tea/sdk/menus.zh.765fcf341d.css?max_age=31536000',
-  });
 
   sdks.forEach((sdk) => register(sdk));
 
@@ -108,6 +106,8 @@ export function setup({
     ...mergeBuildInModules(tipsModules, modules),
     ...mergeBuildInModules(appUtilModules, modules),
     ...mergeBuildInModules(utilModules, modules),
+    ...mergeBuildInModules(getRouterModules(history), modules),
+    ...mergeBuildInModules(getManagerModules(capi), modules),
     clipboard: ClipboardJs,
   };
 
