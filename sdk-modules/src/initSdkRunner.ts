@@ -97,11 +97,13 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
   setup({
     requireRegionData: true,
     sdks: [
-      ...Object.keys(sdkConfigs).map((sdkName) => ({
-        name: sdkName,
-        js: sdkConfigs[sdkName].js,
-        css: sdkConfigs[sdkName].css,
-      })),
+      ...Object.keys(sdkConfigs)
+        .filter((sdkName) => sdkName !== 'cls-sdk')
+        .map((sdkName) => ({
+          name: sdkName,
+          js: sdkConfigs[sdkName].js,
+          css: sdkConfigs[sdkName].css,
+        })),
       {
         name: 'cls-sdk',
         js: config.js,
