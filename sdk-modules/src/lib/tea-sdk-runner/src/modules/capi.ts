@@ -1,44 +1,49 @@
-export const getCapiModules = (capi: CAPIRequest) => ({
-  "models/api": {
-    request: async (body: RequestBody, options: any = {}) => {
-      const { global, ...restOptions } = options;
+import { cloneDeep } from 'lodash';
 
-      let result = await capi(body, {
-        tipLoading: global,
-        ...restOptions,
-      });
+export const getCapiModules = (capi: CAPIRequest) => {
+  const reduceDuplicateCapi: CAPIRequest = duplicatePromiseCombine(capi, keyGen)
+  return ({
+    "models/api": {
+      request: async (body: RequestBody, options: any = {}) => {
+        const { global, ...restOptions } = options;
 
-      if (result.Response && result.code === undefined) {
-        const error = result.Response.Error || {};
-
-        result = {
-          code: error.Code || 0,
-          cgwerrorCode: error.Code || 0,
-          data: result,
-          message: error.Message,
-        };
-      }
-      return result;
-    },
-  },
-  "models/iaas": {
-    apiRequest: async (body: any, options: any = {}) => {
-      const { action, ...restBody } = body;
-      const { global, ...restOptions } = options;
-      let result = await capi(
-        {
-          cmd: action,
-          ...restBody,
-        },
-        {
+        let result = await reduceDuplicateCapi(body, {
           tipLoading: global,
           ...restOptions,
+        });
+
+        if (result.Response && result.code === undefined) {
+          const error = result.Response.Error || {};
+
+          result = {
+            code: error.Code || 0,
+            cgwerrorCode: error.Code || 0,
+            data: result,
+            message: error.Message,
+          };
         }
-      );
-      return result;
+        return result;
+      },
     },
-  },
-});
+    "models/iaas": {
+      apiRequest: async (body: any, options: any = {}) => {
+        const { action, ...restBody } = body;
+        const { global, ...restOptions } = options;
+        let result = await reduceDuplicateCapi(
+          {
+            cmd: action,
+            ...restBody,
+          },
+          {
+            tipLoading: global,
+            ...restOptions,
+          }
+        );
+        return result;
+      },
+    },
+  });
+}
 
 export type CAPIRequest = (
   body: RequestBody,
@@ -108,3 +113,45 @@ export interface RequestOptions {
 }
 
 export interface CAPIResponse {}
+
+export const duplicatePromiseCombine = (function () {
+  const pendings: { [key: string]: Promise<any> } = {};
+
+  /**
+   * @param {Function} promiseFn 原始的 promise 方法
+   * @param {Function} keyGenFn 相同的 promise 通过该方法应该返回相同的 key
+   * @return {Function} 可合并相同 key promise 的方法
+   * @author justanzhu
+   */
+  return function (promiseFn: Function, keyGenFn: Function) {
+    return function () {
+      // eslint-disable-next-line prefer-spread,prefer-rest-params
+      const key = keyGenFn.apply(null, arguments);
+
+      if (Object.prototype.hasOwnProperty.call(pendings, key)) {
+        return pendings[key].then((data) =>
+          // 某个回调可能直接修改该数据
+          cloneDeep(data),
+        );
+      }
+      // eslint-disable-next-line prefer-spread,prefer-rest-params
+      pendings[key] = promiseFn.apply(null, arguments);
+
+      return pendings[key].then(
+        (data) => {
+          delete pendings[key];
+          return data;
+        },
+        (err) => {
+          delete pendings[key];
+          throw err;
+        },
+      );
+    };
+  };
+})();
+
+// 合并参数+url相同的请求
+export const keyGen = function (url: string, param: Object) {
+  return url + "\n" + JSON.stringify(param);
+};
