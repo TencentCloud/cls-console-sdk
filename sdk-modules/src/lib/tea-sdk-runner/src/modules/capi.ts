@@ -1,5 +1,3 @@
-import { cloneDeep } from 'lodash';
-
 export const getCapiModules = (capi: CAPIRequest) => {
   const reduceDuplicateCapi: CAPIRequest = duplicatePromiseCombine(capi, keyGen)
   return ({
@@ -169,6 +167,6 @@ export function clone(obj) {
 }
 
 // 合并参数+url相同的请求
-export const keyGen = function (url: string, param: Object) {
-  return url + "\n" + JSON.stringify(param);
+export const keyGen = function (body: any, options: any) {
+  return JSON.stringify(body) + "\n" + JSON.stringify(options);
 };
