@@ -114,8 +114,9 @@ export interface RequestOptions {
 
 export interface CAPIResponse {}
 
+// 通用 promise 合并
 export const duplicatePromiseCombine = (function () {
-  const pendings: { [key: string]: Promise<any> } = {};
+  const pendings = {};
 
   /**
    * @param {Function} promiseFn 原始的 promise 方法
@@ -125,17 +126,16 @@ export const duplicatePromiseCombine = (function () {
    */
   return function (promiseFn: Function, keyGenFn: Function) {
     return function () {
-      // eslint-disable-next-line prefer-spread,prefer-rest-params
       const key = keyGenFn.apply(null, arguments);
 
-      if (Object.prototype.hasOwnProperty.call(pendings, key)) {
+      if (pendings[key]) {
         return pendings[key].then((data) =>
           // 某个回调可能直接修改该数据
-          cloneDeep(data),
+          clone(data),
         );
       }
-      // eslint-disable-next-line prefer-spread,prefer-rest-params
-      pendings[key] = promiseFn.apply(null, arguments);
+      // @ts-ignore
+      pendings[key] = promiseFn.apply(this, arguments);
 
       return pendings[key].then(
         (data) => {
@@ -150,6 +150,23 @@ export const duplicatePromiseCombine = (function () {
     };
   };
 })();
+
+/**
+ * 普通对象深拷贝(不支持递归对象)
+ * @param obj
+ * @returns {Object}
+ * @author justanzhu
+ */
+export function clone(obj) {
+  if (obj == null || typeof obj !== 'object') {
+    return obj;
+  }
+  const temp = new obj.constructor();
+  for (const key in obj) {
+    temp[key] = clone(obj[key]);
+  }
+  return temp;
+}
 
 // 合并参数+url相同的请求
 export const keyGen = function (url: string, param: Object) {
