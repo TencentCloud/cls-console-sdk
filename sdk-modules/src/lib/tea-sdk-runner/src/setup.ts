@@ -82,7 +82,7 @@ function mergeBuildInModules(
  * 初始化 Runner
  */
 export function setup({
-  sdks,
+  sdks = [],
   capi,
   modules = {},
   loginInfo,
@@ -92,6 +92,14 @@ export function setup({
   // tips 包含在 menus 中
   window['g_buffet_data'] = proxy({ menuRouter: {} });
   window['Insight'] = proxy();
+
+  if (!sdks.some((sdk) => sdk.name === 'menus-sdk')) {
+    sdks.push({
+      name: 'menus-sdk',
+      js: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/menus.zh.214a92de3d.js?max_age=31536000',
+      css: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/menus.zh.626c9dbc53.css?max_age=31536000',
+    });
+  }
 
   sdks.forEach((sdk) => register(sdk));
 
