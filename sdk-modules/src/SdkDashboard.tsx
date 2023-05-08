@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot, Root } from 'react-dom/client';
 
 import { ISdkApi, ISdkDashboardPageControl, ISdkDashboardPageProps } from '@tencent/tea-sdk-cls-types';
 
@@ -31,14 +31,16 @@ export function renderSdkDashboard(
    *  若使用useRef，则外部必须要为函数组件，导致sdk调用对外部产生依赖。使用const常量可以规避
    */
   const controlRef: React.Ref<ISdkDashboardPageControl> = { current: null };
+  let root: Root = null;
   try {
+    root = createRoot(container as HTMLElement);
     const sdkDashboard = <SdkDashboard controlRef={controlRef} {...props} />;
-    ReactDOM.render(sdkDashboard, container);
+    root.render(sdkDashboard);
   } catch (e) {
     console.error(e);
   }
   return {
     controlRef,
-    destroy: () => ReactDOM.unmountComponentAtNode(container),
+    destroy: () => root.unmount(),
   };
 }
