@@ -4,5 +4,5 @@ export declare const SdkDashboard: React.ForwardRefExoticComponent<import("./lib
 /** 非React技术栈方案 */
 export declare function renderSdkDashboard(props: Omit<ISdkDashboardPageProps, 'controlRef'>, container: Element | DocumentFragment): {
     controlRef: React.RefObject<import("./lib/tea-sdk-cls-types/types/src/sdk/DashboardPage/SdkDashboardPage").ISdkDashboardPageControl>;
-    destroy: () => boolean;
+    destroy: () => void;
 };
