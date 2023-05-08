@@ -17,4 +17,4 @@ export interface SDKLoaderProps {
      */
     children: (sdks: any[]) => React.ReactNode;
 }
-export declare function SDKLoader({ sdkNames, loading: fallback, error: errorRender, children, }: SDKLoaderProps): JSX.Element;
+export declare function SDKLoader({ sdkNames, loading: fallback, error: errorRender, children, }: SDKLoaderProps): import("react/jsx-runtime").JSX.Element;
