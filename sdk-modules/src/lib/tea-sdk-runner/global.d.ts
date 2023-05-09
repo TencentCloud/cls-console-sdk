@@ -27,15 +27,16 @@
   })
   ```
   */
-declare function define(
-  moduleId: string,
-  factory: (require: any, exports: any, module: any) => void
-): void;
+declare function define(moduleId: string, factory: (require: any, exports: any, module: any) => void): void;
 
 /**
  * CMD 环境，由 seajs 提供
  */
 declare const seajs: {
+  Module?: any;
+  cache?: any;
+  data?: any;
+
   /**
    * 获取已加载过的 CMD 模块，控制台内置模块都在业务加载前已经提前加载了
    */
@@ -45,6 +46,14 @@ declare const seajs: {
    *  异步加载新的 CMD 模块
    */
   use: (moduleId: string, cb: Callback) => void;
+
+  /** 自定义has方法，用于检测模块是否真实存在，而不是proxy的假对象 */
+  has: (moduleId: string) => boolean;
+
+  /**
+   * 销毁模块，这里仅销毁 seajs 内部的缓存值，不会操作 `script` 和 `link` 标签
+   **/
+  destroy: (moduleId: string, config: { js: string; css?: string | [string] }) => void;
 };
 
 /**
