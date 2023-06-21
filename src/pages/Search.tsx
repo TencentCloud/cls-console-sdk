@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { decode as base64urlDecode } from 'universal-base64url';
 
 import { SdkSearchPage } from '@tencent/cls-sdk-modules';
 import { ISdkSearchPageControl, ISdkSearchPageProps } from '@tencent/tea-sdk-cls-types';
@@ -15,26 +14,13 @@ export function SearchPage() {
   // 初始值使用路由值。后续仅接受页面内数据修改，使用方可自行修改路由逻辑。此组件每次重渲染时，如有参数值变化，SDK内部路由将重新应用
   const [searchParams] = useSearchParams();
 
+  const { pageParams: initPageParams, hideParams: initHideParams } = categorizeSearchParams(searchParams);
+
   /** 页面隐藏参数信息 */
-  const hideParams: ISdkSearchPageProps['hideParams'] = {
-    hideTopicSelect: Boolean(searchParams.get('hideTopicSelect')),
-    hideHeader: Boolean(searchParams.get('hideHeader')),
-    hideTopTips: Boolean(searchParams.get('hideTopTips')),
-    hideConfigMenu: Boolean(searchParams.get('hideConfigMenu')),
-    hideLogDownload: Boolean(searchParams.get('hideLogDownload')),
-  };
+  const hideParams: ISdkSearchPageProps['hideParams'] = initHideParams;
 
   /** 传递给SDK组件的参数信息，每次变更时，SDK将执行参数内容的全量初始化 */
-  const [pageParams, setPageParams] = useState({
-    region: searchParams.get('region'),
-    topicId: searchParams.get('topic_id'),
-    logsetName: searchParams.get('logset_name'),
-    topicName: searchParams.get('topic_name'),
-
-    query: searchParams.get('query') || base64urlDecode(searchParams.get('queryBase64') || ''),
-    time: (searchParams.get('time')?.split(',') as unknown as any) || null,
-    filter: searchParams.get('filter'),
-  } as unknown as ISdkSearchPageProps['pageParams']);
+  const [pageParams, setPageParams] = useState(initPageParams as unknown as ISdkSearchPageProps['pageParams']);
 
   /** 存储SDK内部的实时状态 */
   const [innerPageParams, setInnerPageParams] = useState(pageParams);
@@ -84,5 +70,39 @@ export function SearchPage() {
     </div>
   );
 }
+
+const categorizeSearchParams = (searchParams: URLSearchParams) => {
+  const hideParams: ISdkSearchPageProps['hideParams'] = {};
+  const pageParams: ISdkSearchPageProps['pageParams'] = { region: null };
+  searchParams.forEach((value, key) => {
+    if (key.startsWith('hide')) {
+      hideParams[key] = value;
+      return;
+    }
+    switch (key) {
+      case 'topic_id':
+        pageParams.topicId = value;
+        break;
+      case 'logset_name':
+        pageParams.logsetName = value;
+        break;
+      case 'topic_name':
+        pageParams.topicName = value;
+        break;
+
+      case 'time':
+        pageParams.time = (searchParams.get('time')?.split(',') as unknown as any) || null;
+        break;
+
+      default:
+        pageParams[key] = value;
+        break;
+    }
+  });
+  return {
+    pageParams,
+    hideParams,
+  };
+};
 
 SearchPage.displayName = 'SearchConsoleSdk';

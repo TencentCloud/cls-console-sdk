@@ -39,8 +39,8 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     capi,
     config = {
       // 如果需要配置使用特定的SDK版本，可以在这里配置
-      // js: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.a13a0c0794.js?max_age=31536000',
-      // css: 'https://imgcache.qq.com/qcloud/tea/sdk/cls.zh.1f6e5e1bd7.css?max_age=31536000',
+      // js: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/cls.zh.8afc73b631.js',
+      // css: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/cls.zh.642db74dc1.css',
     } as any,
     loginInfo = {},
     history,
