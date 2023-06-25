@@ -3,7 +3,7 @@ import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http
 import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
 import { IAPIErrorResponse, IApiResponse } from './types';
 import { ConfigService } from '@nestjs/config';
-import { ClientConfig } from 'tencentcloud-sdk-nodejs/src/common/interface';
+import { ClientConfig, Credential } from 'tencentcloud-sdk-nodejs/src/common/interface';
 
 type ResponseData = any;
 interface IApiRequestParams {
@@ -103,9 +103,9 @@ export class AppService {
         multipart: clientConfig.other.multipart,
         requestClient: clientConfig.other.requestClient,
 
-        secretId: credential.secretId,
-        secretKey: credential.secretKey,
-        token: credential.token,
+        secretId: (credential as Credential).secretId,
+        secretKey: (credential as Credential).secretKey,
+        token: (credential as Credential).token,
       });
     } catch (e) {
       throw new TencentCloudSDKHttpException(e.message);
