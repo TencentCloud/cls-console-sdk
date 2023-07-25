@@ -10,11 +10,21 @@ moment.locale('zh-cn');
 
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
+enum Area {
+  MainlandChina = 1,
+  International = 2,
+}
+enum PlatformSite {
+  Default = 0,
+  MainlandChina = 1,
+  International = 2,
+}
+
 export interface LoginInfo {
   appId: number;
   loginUin: string;
   ownerUin: string;
-  area: 1 | 2; // 1国内站 2国际站，同时决定语言
+  area: Area; // 1国内站 2国际站
   countryCode?: '86';
   countryName?: 'CN';
   identity?: any;
@@ -32,6 +42,9 @@ export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | '
   loginInfo?: Partial<LoginInfo>;
 
   history?: History;
+
+  // zh, en
+  language?: 'zh' | 'en';
 }
 
 export async function initSdkRunner(params: ClsSdkInitParams) {
@@ -57,9 +70,11 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     loginInfo.ownerUin = userIdInfo.OwnerUin;
     loginInfo.loginUin = userIdInfo.Uin;
   }
+  const isI18n = loginInfo.area === Area.International;
+  const language = params.language || (isI18n ? 'en' : 'zh');
 
   // 加载SDK最新版本号
-  const configVersionResult = await GetConsoleConfigVersion(capi, loginInfo.area === 2);
+  const configVersionResult = await GetConsoleConfigVersion(capi, language);
   const sdkConfigs: { [key: string]: { js: string; css: string } } = {};
   configVersionResult.forEach((config) => {
     const sdkName = config.Route;
@@ -67,9 +82,17 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       return;
     }
     const sdkConfig = configVersionResult
-      .filter((item) => item.Route === sdkName && item.Site <= 1)
+      .filter((item) => {
+        if (item.Route === sdkName) {
+          return (
+            item.Site === PlatformSite.Default ||
+            item.Site === (isI18n ? PlatformSite.International : PlatformSite.MainlandChina)
+          );
+        }
+        return false;
+      })
       .sort((a, b) => a.Site - b.Site)
-      .pop(); // 优先取 Site === 1 中国站单独配置，否则取 Site === 0 不分站点配置
+      .pop(); // 优先取 Site === 1 中国站 / Site === 2 国际站 单独配置，否则取 Site === 0 不分站点配置
 
     sdkConfigs[sdkName] = {
       js: sdkConfig.Url,
@@ -90,7 +113,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
   }
 
   // 设置Moment语言版本
-  moment.locale(loginInfo.area === 2 ? 'en' : 'zh-cn');
+  moment.locale(language === 'zh' ? 'zh-cn' : language);
 
   initQcHost(loginInfo);
 
@@ -125,10 +148,10 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
 
 // 设置全局Host变量
 function initQcHost(loginInfo: ClsSdkInitParams['loginInfo']) {
-  const isInternational = Number(loginInfo?.area) === 2;
-  const QCLOUD_ROOT_HOST = !isInternational ? 'cloud.tencent.com' : 'tencentcloud.com';
+  const isI18n = Number(loginInfo?.area) === Area.International;
+  const QCLOUD_ROOT_HOST = !isI18n ? 'cloud.tencent.com' : 'tencentcloud.com';
   (window as any).QCLOUD_ROOT_HOST = QCLOUD_ROOT_HOST;
-  (window as any).QCMAIN_HOST = !isInternational ? 'cloud.tencent.com' : 'www.tencentcloud.com';
+  (window as any).QCMAIN_HOST = !isI18n ? 'cloud.tencent.com' : 'www.tencentcloud.com';
   (window as any).QCCDN_HOST = 'cloudcache.tencent-cloud.com';
   (window as any).QCCONSOLE_HOST = `console.${QCLOUD_ROOT_HOST}`;
   (window as any).QCBASE_HOST = `iaas.${QCLOUD_ROOT_HOST}`;
@@ -154,11 +177,11 @@ async function GetUserAppId(capi: SDKRunnerSetupOptions['capi']): Promise<{
 
 async function GetConsoleConfigVersion(
   capi: SDKRunnerSetupOptions['capi'],
-  isI18n?: boolean,
+  language: 'zh' | 'en' = 'zh',
 ): Promise<
   {
     Date: string;
-    Site: number;
+    Site: PlatformSite;
     Lang: string;
     Route: string;
     Url: string;
@@ -167,6 +190,7 @@ async function GetConsoleConfigVersion(
     CSS: string;
   }[]
 > {
+  const platformLanguage = language === 'en' ? 'any' : language;
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Response: { Results },
@@ -175,7 +199,7 @@ async function GetConsoleConfigVersion(
       Total: number;
       Results: {
         Date: string;
-        Site: number;
+        Site: PlatformSite;
         Lang: string;
         Route: string;
         Url: string;
@@ -197,47 +221,40 @@ async function GetConsoleConfigVersion(
         {
           Route: 'cls-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
         {
           Route: 'tag-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
         {
           Route: 'cam-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
         {
           Route: 'menus-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
         {
           Route: 'nps-service-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
         {
           Route: 'help-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
         {
           Route: 'monitor-v2-sdk',
           Type: 'product.sdk',
-          // Site: 1,
-          Lang: 'zh',
+          Lang: platformLanguage,
         },
       ],
     },
   });
-  return Results.filter((item) => (!isI18n ? item.Lang === 'zh' : item.Lang !== 'zh'));
+  return Results;
 }
