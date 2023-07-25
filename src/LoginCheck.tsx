@@ -1,4 +1,5 @@
 import moduleCss from 'bootstrap/dist/css/bootstrap.min.css';
+import Cookie from 'js-cookie';
 import React, { useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { useEffectOnce, useUpdate } from 'react-use';
@@ -11,7 +12,8 @@ export const LoginCheck = (props) => {
   const [showModal, setShowModal] = useState(true);
   const [pwd, setPwd] = useState('');
   useEffectOnce(() => {
-    verifyLogin(forceUpdate).then((res) => {
+    const language = Cookie.get('language');
+    verifyLogin(forceUpdate, language).then((res) => {
       setShowModal(res.showModal);
     });
   });
@@ -21,7 +23,8 @@ export const LoginCheck = (props) => {
   };
   const onConfirm = async () => {
     setShowModal(false);
-    await verifyPassword(pwd, forceUpdate);
+    const language = Cookie.get('language');
+    await verifyPassword(pwd, forceUpdate, language);
   };
   return showModal ? (
     <LoginModal showModal={showModal} pwd={pwd} setPwd={setPwd} onHide={onHide} onConfirm={onConfirm} />

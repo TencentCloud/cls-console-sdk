@@ -1,6 +1,7 @@
-import { ISdkDashboardPageControl, renderSdkDashboard } from '@tencent/cls-sdk-modules';
 import React, { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+
+import { ISdkDashboardPageControl, renderSdkDashboard } from '@tencent/cls-sdk-modules';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 

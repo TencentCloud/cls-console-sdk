@@ -3,7 +3,10 @@ import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http
 import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
 import { IAPIErrorResponse, IApiResponse } from './types';
 import { ConfigService } from '@nestjs/config';
-import { ClientConfig, Credential } from 'tencentcloud-sdk-nodejs/src/common/interface';
+import {
+  ClientConfig,
+  Credential,
+} from 'tencentcloud-sdk-nodejs/src/common/interface';
 
 type ResponseData = any;
 interface IApiRequestParams {
@@ -12,6 +15,7 @@ interface IApiRequestParams {
   region: string;
   service: string;
   version: string;
+  language: string;
 }
 
 @Injectable()
@@ -79,6 +83,7 @@ export class AppService {
     region,
     service,
     version,
+    language,
   }: IApiRequestParams): Promise<ResponseData> {
     const clientConfig = this.clientConfig;
     const { profile, credential } = clientConfig;
@@ -88,6 +93,22 @@ export class AppService {
     const endpoint = serviceName + clientConfig.other.endpointSuffix;
     const url =
       profile.httpProfile.protocol + endpoint + clientConfig.other.path;
+
+    let capiLanguage;
+    if (language) {
+      switch (language) {
+        case 'en':
+          capiLanguage = 'en-US';
+          break;
+        case 'zh':
+          capiLanguage = 'zh-CN';
+          break;
+      }
+    }
+    if (!capiLanguage) {
+      capiLanguage = profile.language;
+    }
+
     try {
       res = await HttpConnection.doRequestWithSign3({
         region: region,
@@ -98,7 +119,7 @@ export class AppService {
 
         method: profile.httpProfile.reqMethod,
         timeout: profile.httpProfile.reqTimeout * 1000,
-        language: profile.language,
+        language: capiLanguage,
         url: url,
         multipart: clientConfig.other.multipart,
         requestClient: clientConfig.other.requestClient,

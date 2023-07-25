@@ -25,6 +25,7 @@ export class AppController {
       region: 'ap-shanghai',
       service: 'cls',
       version: '2020-10-16',
+      language: 'zh-CN',
     });
   }
 
@@ -38,12 +39,14 @@ export class AppController {
     }
 
     const { action, data, region, service, version } = body;
+    const { language } = request.cookies;
     return this.appService.doCApiRequest({
       action,
       region,
       service,
       data,
       version,
+      language,
     });
   }
 

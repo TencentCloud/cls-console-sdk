@@ -4,11 +4,11 @@ import { CApiForward, getForwardData, postForwardData } from './utils/capi';
 import { IApiResponse } from './utils/types';
 
 // 登录 验证密码
-export const verifyPassword = async (pwd: string, forceUpdate: () => void) => {
+export const verifyPassword = async (pwd: string, forceUpdate: () => void, language?: 'zh' | 'en') => {
   try {
     await Login(pwd);
     if (!(window as any).TeaSDKRunner) {
-      initSdkRunner({ capi: CApiForward }).then(() => forceUpdate());
+      initSdkRunner({ capi: CApiForward, language }).then(() => forceUpdate());
     }
   } catch (e: any) {
     if (e?.code === 401) {
@@ -18,12 +18,12 @@ export const verifyPassword = async (pwd: string, forceUpdate: () => void) => {
 };
 
 // 验证是否已登录
-export const verifyLogin = (forceUpdate: () => void) =>
+export const verifyLogin = (forceUpdate: () => void, language?: 'zh' | 'en') =>
   isLog()
     .then((res) => {
       if (res) {
         if (!(window as any).TeaSDKRunner) {
-          initSdkRunner({ capi: CApiForward }).then(() => forceUpdate());
+          initSdkRunner({ capi: CApiForward, language }).then(() => forceUpdate());
         }
         return { showModal: false };
       }
