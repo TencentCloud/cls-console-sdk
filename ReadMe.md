@@ -18,10 +18,14 @@
 # 环境变量区分大小写。secretId长度为36位，secretKey长度为32位。
 secretId=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+<!-- 以下为可选配置： -->
 # 部署在内网环境时，设置为 true
 #internal=true
 # 设置后支持密码鉴权，不设置则无任何鉴权
-demoPassword=123456
+#demoPassword=123456
+# 独立部署所在域名，设置后页面内所有跳转默认使用该域名
+#CLS_DEPLOYMENT_HOST=clsiframe.com
 ```
 
 ## 部署项目

@@ -25,12 +25,12 @@ export const verifyLogin = (forceUpdate: () => void, language?: 'zh' | 'en') =>
         if (!(window as any).TeaSDKRunner) {
           initSdkRunner({ capi: CApiForward, language }).then(() => forceUpdate());
         }
-        return { showModal: false };
+        return { isLoggedIn: true };
       }
     })
     .catch((err) => {
       console.error(err);
-      return { showModal: true };
+      return { isLoggedIn: false };
     });
 
 async function Login(pwd): Promise<IApiResponse> {
