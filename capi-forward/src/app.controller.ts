@@ -9,7 +9,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   @Get('/test')
   testRequest(@Req() request: Request): any {
@@ -28,6 +28,39 @@ export class AppController {
       language: 'zh-CN',
     });
   }
+
+  /**
+   * 获取提供给前端使用的环境变量
+   */
+  @Get('/config/env')
+  getEnv(@Req() request: Request): any {
+    if (!this.isRequestLoggedIn(request)) {
+      return {
+        code: 401,
+        data: 'failed',
+      };
+    }
+    const envList = ['CLS_DEPLOYMENT_HOST']
+
+    try {
+      return {
+        code: 0,
+        data: envList.reduce((acc, envName) => {
+          acc[envName] = process.env[envName]
+          return acc;
+        }, {})
+      };
+    } catch (error) {
+      console.error('getEnv failed', error)
+      return {
+        code: 500,
+        data: {}
+      }
+    }
+
+
+  }
+
 
   @Post('/forward')
   capiRequest(@Req() request: Request, @Body() body): any {

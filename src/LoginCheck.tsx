@@ -1,33 +1,42 @@
 import moduleCss from 'bootstrap/dist/css/bootstrap.min.css';
 import Cookie from 'js-cookie';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
 import { useEffectOnce, useUpdate } from 'react-use';
 
 import { verifyLogin, verifyPassword } from './init';
+import { getForwardData } from './utils/capi';
 
 export const LoginCheck = (props) => {
   const forceUpdate = useUpdate();
 
-  const [showModal, setShowModal] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pwd, setPwd] = useState('');
   useEffectOnce(() => {
     const language = Cookie.get('language');
     verifyLogin(forceUpdate, language).then((res) => {
-      setShowModal(res.showModal);
+      setIsLoggedIn(res.isLoggedIn);
     });
   });
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    //  执行登录后的初始化
+    getEnvAndSetWindow();
+  }, [isLoggedIn]);
+
   const onHide = () => {
-    setShowModal(false);
+    setIsLoggedIn(false);
   };
   const onConfirm = async () => {
-    setShowModal(false);
     const language = Cookie.get('language');
-    await verifyPassword(pwd, forceUpdate, language);
+    try {
+      await verifyPassword(pwd, forceUpdate, language);
+      setIsLoggedIn(true);
+    } catch (error) { }
   };
-  return showModal ? (
-    <LoginModal showModal={showModal} pwd={pwd} setPwd={setPwd} onHide={onHide} onConfirm={onConfirm} />
+  return !isLoggedIn ? (
+    <LoginModal showModal={!isLoggedIn} pwd={pwd} setPwd={setPwd} onHide={onHide} onConfirm={onConfirm} />
   ) : (
     props.children()
   );
@@ -67,4 +76,15 @@ const LoginModal = (props: {
       </Modal.Footer>
     </Modal>
   );
+};
+
+const getEnvAndSetWindow = async () => {
+  const response = await getForwardData('/config/env');
+  if (response.code) {
+    console.warn('getEnvAndSetWindow failed');
+    return;
+  }
+  Object.keys(response.data).forEach((envKey) => {
+    window[envKey] = response.data[envKey];
+  });
 };
