@@ -65,10 +65,11 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
 
   // 加载用户ID信息
   if (!(loginInfo?.appId && loginInfo?.ownerUin && loginInfo?.loginUin)) {
-    const userIdInfo = await GetUserAppId(capi);
-    loginInfo.appId = userIdInfo.AppId;
-    loginInfo.ownerUin = userIdInfo.OwnerUin;
-    loginInfo.loginUin = userIdInfo.Uin;
+    const userIdInfo = await DescribeCurrentUserDetails(capi);
+    loginInfo.appId = Number(userIdInfo.AppId?.[0]);
+    loginInfo.ownerUin = String(userIdInfo.OwnerUin);
+    loginInfo.loginUin = String(userIdInfo.Uin);
+    loginInfo.area = Number(userIdInfo.Area) > 0 ? Area.International : Area.MainlandChina;
   }
   const isI18n = loginInfo.area === Area.International;
   const language = params.language || (isI18n ? 'en' : 'zh');
@@ -94,10 +95,12 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       .sort((a, b) => a.Site - b.Site)
       .pop(); // 优先取 Site === 1 中国站 / Site === 2 国际站 单独配置，否则取 Site === 0 不分站点配置
 
-    sdkConfigs[sdkName] = {
-      js: sdkConfig.Url,
-      css: sdkConfig.CSS,
-    };
+    if (sdkConfig?.Url) {
+      sdkConfigs[sdkName] = {
+        js: sdkConfig.Url,
+        css: sdkConfig.CSS,
+      };
+    }
   });
 
   if (!(config.js && config.css)) {
@@ -158,18 +161,19 @@ function initQcHost(loginInfo: ClsSdkInitParams['loginInfo']) {
   (window as any).QCBUY_HOST = `buy.${QCLOUD_ROOT_HOST}`;
 }
 
-async function GetUserAppId(capi: SDKRunnerSetupOptions['capi']): Promise<{
-  AppId: number;
-  OwnerUin: string;
-  Uin: string;
+async function DescribeCurrentUserDetails(capi: SDKRunnerSetupOptions['capi']): Promise<{
+  AppId: number[];
+  OwnerUin: number;
+  Uin: number;
+  Area: string;
   RequestId: string;
 }> {
   const res = await capi({
     regionId: 1,
-    serviceType: 'cam',
-    cmd: 'GetUserAppId',
+    serviceType: 'account',
+    cmd: 'DescribeCurrentUserDetails',
     data: {
-      Version: '2019-01-16',
+      Version: '2018-12-25',
     },
   });
   return res.Response;
