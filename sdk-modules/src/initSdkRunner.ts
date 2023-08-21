@@ -7,6 +7,12 @@ import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils
 
 window.moment = moment;
 moment.locale('zh-cn');
+window.regionConfig = {
+  regionList: [],
+  intlRegionList: [],
+  ftCloudRegionList: [],
+  autoDrivingCloudRegions: [],
+};
 
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
@@ -63,20 +69,30 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     return Promise.reject('init params error!');
   }
 
+  const promises: Promise<any>[] = [];
+
+  // 加载SDK最新版本号
+  promises.push(GetConsoleConfigVersion(capi));
   // 加载用户ID信息
-  if (!(loginInfo?.appId && loginInfo?.ownerUin && loginInfo?.loginUin)) {
-    const userIdInfo = await DescribeCurrentUserDetails(capi);
+  const needInitLoginInfo = !(loginInfo?.appId && loginInfo?.ownerUin && loginInfo?.loginUin && loginInfo?.area);
+  if (needInitLoginInfo) {
+    promises.push(DescribeCurrentUserDetails(capi));
+  }
+  // 并发发起请求
+  const [configVersionResult, userIdInfo] = await Promise.all(promises);
+
+  if (needInitLoginInfo) {
     loginInfo.appId = Number(userIdInfo.AppId?.[0]);
     loginInfo.ownerUin = String(userIdInfo.OwnerUin);
     loginInfo.loginUin = String(userIdInfo.Uin);
     loginInfo.area = Number(userIdInfo.Area) > 0 ? Area.International : Area.MainlandChina;
   }
+
   const isI18n = loginInfo.area === Area.International;
   const language = params.language || (isI18n ? 'en' : 'zh');
 
-  // 加载SDK最新版本号
-  const configVersionResult = await GetConsoleConfigVersion(capi, language);
   const sdkConfigs: { [key: string]: { js: string; css: string } } = {};
+  const platformLanguage = language === 'en' ? 'any' : language;
   configVersionResult.forEach((config) => {
     const sdkName = config.Route;
     if (sdkConfigs[sdkName]) {
@@ -84,6 +100,9 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     }
     const sdkConfig = configVersionResult
       .filter((item) => {
+        if (item.Lang !== platformLanguage) {
+          return false;
+        }
         if (item.Route === sdkName) {
           return (
             item.Site === PlatformSite.Default ||
@@ -179,10 +198,7 @@ async function DescribeCurrentUserDetails(capi: SDKRunnerSetupOptions['capi']): 
   return res.Response;
 }
 
-async function GetConsoleConfigVersion(
-  capi: SDKRunnerSetupOptions['capi'],
-  language: 'zh' | 'en' = 'zh',
-): Promise<
+async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Promise<
   {
     Date: string;
     Site: PlatformSite;
@@ -194,7 +210,6 @@ async function GetConsoleConfigVersion(
     CSS: string;
   }[]
 > {
-  const platformLanguage = language === 'en' ? 'any' : language;
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Response: { Results },
@@ -225,37 +240,30 @@ async function GetConsoleConfigVersion(
         {
           Route: 'cls-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
         {
           Route: 'tag-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
         {
           Route: 'cam-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
         {
           Route: 'menus-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
         {
           Route: 'nps-service-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
         {
           Route: 'help-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
         {
           Route: 'monitor-v2-sdk',
           Type: 'product.sdk',
-          Lang: platformLanguage,
         },
       ],
     },

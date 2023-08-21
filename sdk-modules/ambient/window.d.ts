@@ -1,6 +1,12 @@
 
 declare interface Window {
   seajs: typeof seajs;
+  regionConfig: {
+    regionList: any[],
+    intlRegionList: any[],
+    ftCloudRegionList: any[],
+    autoDrivingCloudRegions: any[],
+  };
   // console环境window
   /** e.g. cloud.tencent.com */
   QCMAIN_HOST: string;
