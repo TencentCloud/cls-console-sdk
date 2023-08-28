@@ -165,6 +165,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       ...loginInfo,
     },
     history,
+    language,
   });
 }
 

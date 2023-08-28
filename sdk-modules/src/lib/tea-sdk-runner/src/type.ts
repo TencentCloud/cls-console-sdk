@@ -1,5 +1,6 @@
-import { CAPIRequest } from "./modules/capi";
 import type { History } from 'history';
+
+import { CAPIRequest } from './modules/capi';
 
 export interface SDKRunnerSDKEntry {
   /**
@@ -49,4 +50,6 @@ export interface SDKRunnerSetupOptions {
   requireRegionData?: boolean;
 
   history?: History;
+
+  language?: 'zh' | 'en';
 }

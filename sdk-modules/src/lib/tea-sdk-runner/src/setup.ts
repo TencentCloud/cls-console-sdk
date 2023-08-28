@@ -3,7 +3,7 @@ import { isArray } from 'lodash';
 import { appUtilModules } from './modules/appUtil';
 import { getCapiModules } from './modules/capi';
 import { ClipboardJs } from './modules/clipboard';
-import { constantsModules } from './modules/constants';
+import { getConstantsModules } from './modules/constants';
 import { getManagerModules } from './modules/manager';
 import { getRouterModules } from './modules/router';
 import { tipsModules } from './modules/tips';
@@ -103,7 +103,7 @@ function mergeBuildInModules(buildInModules: SDKRunnerEnvModules, modules: SDKRu
 /**
  * 初始化 Runner
  */
-export function setup({ sdks = [], capi, modules = {}, loginInfo, history }: SDKRunnerSetupOptions) {
+export function setup({ sdks = [], capi, modules = {}, loginInfo, history, language }: SDKRunnerSetupOptions) {
   // tips 包含在 menus 中
   // @ts-ignore
   window.g_buffet_data = proxy({ menuRouter: {} });
@@ -127,7 +127,7 @@ export function setup({ sdks = [], capi, modules = {}, loginInfo, history }: SDK
   // eslint-disable-next-line no-param-reassign
   modules = {
     ...modules,
-    ...mergeBuildInModules(constantsModules, modules),
+    ...mergeBuildInModules(getConstantsModules(language), modules),
     ...mergeBuildInModules(getCapiModules(capi), modules),
     ...mergeBuildInModules(tipsModules, modules),
     ...mergeBuildInModules(appUtilModules, modules),
