@@ -13,7 +13,7 @@ export const LoginCheck = (props) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [pwd, setPwd] = useState('');
   useEffectOnce(() => {
-    const language = Cookie.get('language');
+    const language = Cookie.get('language') as 'zh' | 'en';
     verifyLogin(forceUpdate, language).then((res) => {
       setIsLoggedIn(res.isLoggedIn);
     });
@@ -29,11 +29,11 @@ export const LoginCheck = (props) => {
     setIsLoggedIn(false);
   };
   const onConfirm = async () => {
-    const language = Cookie.get('language');
+    const language = Cookie.get('language') as 'zh' | 'en';
     try {
       await verifyPassword(pwd, forceUpdate, language);
       setIsLoggedIn(true);
-    } catch (error) { }
+    } catch (error) {}
   };
   return !isLoggedIn ? (
     <LoginModal showModal={!isLoggedIn} pwd={pwd} setPwd={setPwd} onHide={onHide} onConfirm={onConfirm} />
