@@ -65,6 +65,8 @@ declare interface Window {
   LOGIN_INFO: Record;
   React16: any;
   ReactDOM16: any;
+  TeaSDKRunner: any;
+  getLifeInfo: () => Object;
 }
 
 /**

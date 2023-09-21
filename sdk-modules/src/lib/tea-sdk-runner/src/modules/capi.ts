@@ -1,14 +1,12 @@
 export const getCapiModules = (capi: CAPIRequest) => {
-  const reduceDuplicateCapi: CAPIRequest = duplicatePromiseCombine(capi, keyGen)
-  return ({
-    "models/api": {
+  const reduceDuplicateCapi: CAPIRequest = duplicatePromiseCombine(capi, keyGen);
+  return {
+    'models/api': {
       request: async (body: RequestBody, options: any = {}) => {
-        const { global, ...restOptions } = options;
-
-        let result = await reduceDuplicateCapi(body, {
-          tipLoading: global,
-          ...restOptions,
-        });
+        if (options.global) {
+          options.tipLoading = options.global;
+        }
+        let result = await reduceDuplicateCapi(body, options);
 
         if (result.Response && result.code === undefined) {
           const error = result.Response.Error || {};
@@ -23,30 +21,26 @@ export const getCapiModules = (capi: CAPIRequest) => {
         return result;
       },
     },
-    "models/iaas": {
+    'models/iaas': {
       apiRequest: async (body: any, options: any = {}) => {
         const { action, ...restBody } = body;
-        const { global, ...restOptions } = options;
-        let result = await reduceDuplicateCapi(
+        if (options.global) {
+          options.tipLoading = options.global;
+        }
+        const result = await reduceDuplicateCapi(
           {
             cmd: action,
             ...restBody,
           },
-          {
-            tipLoading: global,
-            ...restOptions,
-          }
+          options,
         );
         return result;
       },
     },
-  });
-}
+  };
+};
 
-export type CAPIRequest = (
-  body: RequestBody,
-  options?: RequestOptions
-) => Promise<any>;
+export type CAPIRequest = (body: RequestBody, options?: RequestOptions) => Promise<any>;
 
 export interface RequestBody {
   /**
@@ -110,8 +104,6 @@ export interface RequestOptions {
   tipLoading?: boolean;
 }
 
-export interface CAPIResponse {}
-
 // 通用 promise 合并
 export const duplicatePromiseCombine = (function () {
   const pendings = {};
@@ -168,5 +160,5 @@ export function clone(obj) {
 
 // 合并参数+url相同的请求
 export const keyGen = function (body: any, options: any) {
-  return JSON.stringify(body) + "\n" + JSON.stringify(options);
+  return `${JSON.stringify(body)}\n${JSON.stringify(options)}`;
 };

@@ -123,6 +123,7 @@ export function setup({ sdks = [], capi, modules = {}, loginInfo, history, langu
   if (loginInfo) {
     window.LOGIN_INFO = loginInfo;
   }
+  window.getLifeInfo = () => ({});
 
   // eslint-disable-next-line no-param-reassign
   modules = {
@@ -137,7 +138,6 @@ export function setup({ sdks = [], capi, modules = {}, loginInfo, history, langu
     clipboard: ClipboardJs,
   };
 
-  // @ts-ignore
   window.TeaSDKRunner = modules;
 
   initShim(modules);
