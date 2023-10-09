@@ -9,7 +9,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   @Get('/test')
   testRequest(@Req() request: Request): any {
@@ -40,27 +40,24 @@ export class AppController {
         data: 'failed',
       };
     }
-    const envList = ['CLS_DEPLOYMENT_HOST']
+    const envList = ['CLS_DEPLOYMENT_HOST'];
 
     try {
       return {
         code: 0,
         data: envList.reduce((acc, envName) => {
-          acc[envName] = process.env[envName]
+          acc[envName] = process.env[envName];
           return acc;
-        }, {})
+        }, {}),
       };
     } catch (error) {
-      console.error('getEnv failed', error)
+      console.error('getEnv failed', error);
       return {
         code: 500,
-        data: {}
-      }
+        data: {},
+      };
     }
-
-
   }
-
 
   @Post('/forward')
   capiRequest(@Req() request: Request, @Body() body): any {
