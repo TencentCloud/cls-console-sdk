@@ -8,7 +8,7 @@ COPY . /BUILD
 
 
 RUN npm i -g pnpm pm2
-RUN pnpm recursive install --frozen-lockfile=true
+RUN pnpm install && cd ./capi-forward && pnpm install && cd ../sdk-modules && pnpm install && cd ../
 RUN pnpm run build
 
 
