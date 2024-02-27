@@ -53,7 +53,7 @@ declare const seajs: {
   /**
    * 销毁模块，这里仅销毁 seajs 内部的缓存值，不会操作 `script` 和 `link` 标签
    **/
-  destroy: (moduleId: string, config: { js: string; css?: string | [string] }) => void;
+  destroy: (moduleId: string, config: { js: string; css?: string | string[] }) => void;
 };
 
 /**
