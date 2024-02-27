@@ -16,7 +16,7 @@ export interface SDKRunnerSDKEntry {
   /**
    * SDK 对应 CSS URL
    */
-  css?: string | [string];
+  css?: string | string[];
 }
 
 export interface SDKRunnerEnvModules {
@@ -52,4 +52,6 @@ export interface SDKRunnerSetupOptions {
   history?: History;
 
   language?: 'zh' | 'en';
+
+  includeGlobalCss?: boolean;
 }

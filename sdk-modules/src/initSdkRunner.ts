@@ -51,6 +51,9 @@ export interface ClsSdkInitParams extends Omit<SDKRunnerSetupOptions, 'sdks' | '
 
   // zh, en
   language?: 'zh' | 'en';
+
+  // 是否引用默认全局CSS，默认true。如为false，则需要在页面中手动引用css，以免部分页面显示异常。
+  includeGlobalCss?: boolean;
 }
 
 export async function initSdkRunner(params: ClsSdkInitParams) {
@@ -63,6 +66,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     } as any,
     loginInfo = {},
     history,
+    includeGlobalCss = true,
   } = params;
 
   if (!capi) {
@@ -100,7 +104,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     }
     const sdkConfig = configVersionResult
       .filter((item) => {
-        if (item.Lang !== platformLanguage) {
+        if (item.Route !== 'global-css-sdk' && item.Lang !== platformLanguage) {
           return false;
         }
         if (item.Route === sdkName) {
@@ -166,6 +170,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     },
     history,
     language,
+    includeGlobalCss,
   });
 }
 
@@ -264,6 +269,10 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
         },
         {
           Route: 'monitor-v2-sdk',
+          Type: 'product.sdk',
+        },
+        {
+          Route: 'global-css-sdk',
           Type: 'product.sdk',
         },
       ],

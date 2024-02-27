@@ -103,19 +103,37 @@ function mergeBuildInModules(buildInModules: SDKRunnerEnvModules, modules: SDKRu
 /**
  * 初始化 Runner
  */
-export function setup({ sdks = [], capi, modules = {}, loginInfo, history, language }: SDKRunnerSetupOptions) {
+export function setup({
+  sdks = [],
+  capi,
+  modules = {},
+  loginInfo,
+  history,
+  language,
+  includeGlobalCss,
+}: SDKRunnerSetupOptions) {
   // tips 包含在 menus 中
   // @ts-ignore
   window.g_buffet_data = proxy({ menuRouter: {} });
   // @ts-ignore
   window.Insight = proxy();
 
-  if (!sdks.some((sdk) => sdk.name === 'menus-sdk')) {
-    sdks.push({
-      name: 'menus-sdk',
-      js: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/menus.zh.214a92de3d.js?max_age=31536000',
-      css: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/menus.zh.626c9dbc53.css?max_age=31536000',
-    });
+  // 引入global-css
+  if (includeGlobalCss) {
+    const cdnHost = window.QCCDN_HOST || 'cloudcache.tencent-cloud.com';
+    const globalCssSdk = sdks.find((sdk) => sdk.name === 'global-css-sdk');
+    if (globalCssSdk) {
+      const globalCss = (globalCssSdk.css as string[])?.map((css) =>
+        css.replace(/imgcache.qq.com|cloudcache.tencent-cloud.com/, cdnHost),
+      );
+      globalCss.forEach((css) => {
+        const ele = document.createElement('link');
+        ele.setAttribute('type', 'text/css');
+        ele.setAttribute('rel', 'Stylesheet');
+        ele.setAttribute('href', css);
+        document.head.append(ele);
+      });
+    }
   }
 
   sdks.forEach((sdk) => register(sdk));

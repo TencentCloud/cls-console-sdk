@@ -67,6 +67,7 @@ declare interface Window {
   ReactDOM16: any;
   TeaSDKRunner: any;
   getLifeInfo: () => Object;
+  QCCDN_HOST: string;
 }
 
 /**
