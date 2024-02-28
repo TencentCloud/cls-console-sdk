@@ -126,13 +126,19 @@ export function setup({
       const globalCss = (globalCssSdk.css as string[])?.map((css) =>
         css.replace(/imgcache.qq.com|cloudcache.tencent-cloud.com/, cdnHost),
       );
-      globalCss.forEach((css) => {
-        const ele = document.createElement('link');
-        ele.setAttribute('type', 'text/css');
-        ele.setAttribute('rel', 'Stylesheet');
-        ele.setAttribute('href', css);
-        document.head.append(ele);
-      });
+      globalCss
+        .filter(
+          (css) =>
+            // 过滤掉部门用不到的样式
+            !/bee\.css|tea-[\d.]*\.min\.css|monitor-sdk\.css/.test(css),
+        )
+        .forEach((css) => {
+          const ele = document.createElement('link');
+          ele.setAttribute('type', 'text/css');
+          ele.setAttribute('rel', 'Stylesheet');
+          ele.setAttribute('href', css);
+          document.head.append(ele);
+        });
     }
   }
 
