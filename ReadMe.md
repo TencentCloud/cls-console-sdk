@@ -1,15 +1,18 @@
 # CLS 控制台独立运行环境
 
-本项目是基于 `sdk-modules` 文件夹，实现的 独立运行环境 快速体验样例。允许业务方将CLS控制台集成到自身页面，使用检索分析页面和仪表盘能力。
+本项目是基于 `sdk-modules` 文件夹，实现的 独立运行环境 快速体验样例。允许业务方将CLS控制台通过前端代码调用SDK集成到自身页面，使用检索分析页面和仪表盘能力。
 
-为达成业务对权限管控和页面集成的相关诉求，需要进行前端页面嵌入 和 后端接入层转发 逻辑的开发工作，详情请参考 [独立运行环境接入文档](https://github.com/TencentCloud/cls-console-sdk/blob/main/sdk-modules/ReadMe.md)。
-
+为达成业务对权限管控、代码传参、页面集成等相关诉求，需要进行 **前端页面嵌入** 和 **后端接入层转发** 两方面逻辑的开发工作，**开发指引请参考 [独立运行环境接入文档](./sdk-modules/ReadMe.md)**。
 
 
 注意：<br />
 对于仅需要实现控制台免登陆访问，无需特殊权限管控的客户，为减少工作量，
 推荐使用 [roleAccess 免登陆访问](https://cloud.tencent.com/document/product/614/45742)，
 相关效果可参考 [演示示例](https://github.com/TencentCloud/cls-iframe-demo)。
+
+---
+
+以下内容是运行本项目Demo示例部分，**开发指引请参考 [独立运行环境接入文档](./sdk-modules/ReadMe.md)**。
 
 ## 演示使用前提
 

@@ -13,9 +13,9 @@
 此方式接入复杂，需要相当的人力开发，推荐直接使用SDK项目整体包装方案。
 
 ## 后端部分
-目标：参考capi-forward文件夹，创建一个提供云API调用转发的服务（也可直接在原有后端服务中集成）
+目标：参考[capi-forward](../capi-forward)文件夹，创建一个提供云API调用转发的服务（也可直接在原有后端服务中集成）
 
-1. 参考AppService中内容，实现 doCApiRequest 方法，返回指定参数格式的内容（格式为 {Response: ...} 对象 ）。
+1. 参考[AppService](../capi-forward/src/app.service.ts)中内容，实现 doCApiRequest 方法，返回指定参数格式的内容（格式为 {Response: ...} 对象 ）。
 
    当前项目使用了腾讯云Nodejs SDK 中的 doRequestWithSign3 方法，处理接口的请求签名生成。
 
@@ -27,11 +27,11 @@
 目标：调用 CLS-SDK, 在业务内部页面中，渲染相关内容。
 1. 进入文件夹 sdk-modules，执行 `npm run build`, 构建出用于独立使用的js包。（不含React）
 
-2. 参考 src/App.tsx 内容，进行 `initSdkRunner` 调用。参数capi负责将SDK内部请求，转发到业务实现的后端服务。
+2. 参考 [src/App.tsx](../src/App.tsx) 内容，进行 `initSdkRunner` 调用。参数capi负责将SDK内部请求，转发到业务实现的后端服务。
 
 3. 使用 `window.TeaSDKRunner` 判断SDK初始化完成状态，当初始化完成后，可进行SDK内组件渲染。
 
-4. 参考 src/Page/SearchPage.tsx 逻辑，使用sdk-modules包中的检索页组件，并自行处理页面路由、Topic选择器等功能。
+4. 参考 [src/pages/Search.tsx](../src/pages/Search.tsx) 逻辑，使用sdk-modules包中的检索页组件，并自行处理页面路由、Topic选择器等功能。
 
 5. 在业务使用方，主动引入 `sdk-modules/lib/tea.css` 文件（主要负责reset全局样式逻辑），缺少样式引入可能导致部分布局内容展示异常。
 
@@ -39,6 +39,6 @@
 
 ## 其他
 
-自定义开发时，实现 capi 方法可参考 `$projectRoot/src/utils/capi.ts` 文件内容。
+自定义开发时，实现 capi 方法可参考 [src/utils/capi.ts](../src/utils/capi.ts) 文件内容。
 
 如果业务系统使用的是js代码，可考虑在仓库根目录执行 `tsc -p tsconfig-js.json` 命令，可在jsSrc文件夹中获取到源码的js版本内容，并修改引入到业务方代码中。
