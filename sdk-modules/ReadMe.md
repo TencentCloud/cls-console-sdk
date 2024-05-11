@@ -37,6 +37,8 @@
 
 6. 在业务使用方，主动引入`src/polyfill.ts`文件并安装`regenerator-runtime`依赖，缺少可能导致页面无法渲染。
 
+7. (可选) 可同步SDK内参数到URL，参考 [src/pages/Search.tsx](../src/pages/Search.tsx) "可选：同步SDK内部状态到URL，支持刷新后自动选中之前状态" 处。如不需要，删除相关逻辑即可。
+
 ## 其他
 
 自定义开发时，实现 capi 方法可参考 [src/utils/capi.ts](../src/utils/capi.ts) 文件内容。
