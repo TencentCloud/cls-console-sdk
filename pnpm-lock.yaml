@@ -26,9 +26,6 @@ dependencies:
   js-cookie:
     specifier: ^2.2.1
     version: 2.2.1
-  lodash:
-    specifier: ^4.17.21
-    version: 4.17.21
   moment:
     specifier: ^2.29.4
     version: 2.29.4

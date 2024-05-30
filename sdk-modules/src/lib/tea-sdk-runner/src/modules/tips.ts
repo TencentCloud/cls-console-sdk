@@ -1,4 +1,4 @@
-import { isNull, isObject } from 'lodash';
+import { isNull, isObject } from 'lodash-es';
 
 import { use } from '../sdk';
 

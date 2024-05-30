@@ -1,4 +1,4 @@
-import { isArray } from 'lodash';
+import { isArray } from 'lodash-es';
 
 import { appUtilModules } from './modules/appUtil';
 import { getCapiModules } from './modules/capi';
