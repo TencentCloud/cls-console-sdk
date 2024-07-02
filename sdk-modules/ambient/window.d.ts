@@ -7,6 +7,8 @@ declare interface Window {
     ftCloudRegionList: any[],
     autoDrivingCloudRegions: any[],
   };
+  ftCloudRegions: any[];
+  autoDrivingCloudRegions: any[];
   // console环境window
   /** e.g. cloud.tencent.com */
   QCMAIN_HOST: string;

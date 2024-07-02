@@ -10,9 +10,60 @@ moment.locale('zh-cn');
 window.regionConfig = {
   regionList: [],
   intlRegionList: [],
-  ftCloudRegionList: [],
-  autoDrivingCloudRegions: [],
+  ftCloudRegionList: [
+    {
+      id: 11,
+      region: 'ap-shenzhen-fsi',
+      regionName: '华南地区（深圳金融）',
+      regionNameEn: 'South China (Shenzhen Finance)',
+      regionPrefix: 'szjr',
+      zoneList: [
+        {
+          zoneId: 110001,
+          zoneName: '深圳金融一区',
+          zoneCode: 'ap-shenzhen-fsi-1',
+        },
+        {
+          zoneId: 110003,
+          zoneName: '深圳金融三区',
+          zoneCode: 'ap-shenzhen-fsi-3',
+        },
+      ],
+    },
+    {
+      id: 7,
+      region: 'ap-shanghai-fsi',
+      regionName: '华东地区（上海金融）',
+      regionNameEn: 'East China (Shanghai Finance)',
+      regionPrefix: 'shjr',
+      zoneList: [
+        {
+          zoneId: 700002,
+          zoneName: '上海金融二区',
+          zoneCode: 'ap-shanghai-fsi-2',
+        },
+      ],
+    },
+  ],
+  autoDrivingCloudRegions: [
+    {
+      id: 78,
+      region: 'ap-shanghai-adc',
+      regionName: '华东地区（上海自动驾驶云）',
+      regionNameEn: 'East China (ap-shanghai-adc)',
+      regionPrefix: 'shadc',
+      zoneList: [
+        {
+          zoneId: 780001,
+          zoneName: '上海自动驾驶云一区',
+          zoneCode: 'ap-shanghai-adc-1',
+        },
+      ],
+    },
+  ],
 };
+window.ftCloudRegions = window.regionConfig.ftCloudRegionList;
+window.autoDrivingCloudRegions = window.regionConfig.autoDrivingCloudRegions;
 
 const CLS_SDK_VERSION = 'cls-sdk-version';
 
