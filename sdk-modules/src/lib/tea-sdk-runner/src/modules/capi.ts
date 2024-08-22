@@ -27,6 +27,9 @@ export const getCapiModules = (capi: CAPIRequest) => {
         if (options.global) {
           options.tipLoading = options.global;
         }
+        if (options.json !== false) {
+          options.json = true;
+        }
         const result = await reduceDuplicateCapi(
           {
             cmd: action,
