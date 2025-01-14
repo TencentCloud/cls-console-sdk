@@ -6,14 +6,13 @@ ENV NODE_ENV build
 WORKDIR /BUILD
 COPY . /BUILD
 
-
-RUN npm i -g pnpm pm2
+RUN npm config set registry "http://mirrors.tencent.com/npm/" --global
+RUN npm i -g pnpm@8
 RUN pnpm install && cd ./capi-forward && pnpm install && cd ../sdk-modules && pnpm install && cd ../
 RUN pnpm run build
 
-
 ENV NODE_ENV production
 
-CMD ["pm2-runtime", "start", "capi-forward/dist/main.js"]
-
 EXPOSE 3001
+
+ENTRYPOINT node capi-forward/dist/main.js

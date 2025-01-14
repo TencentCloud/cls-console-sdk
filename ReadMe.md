@@ -70,6 +70,9 @@ http://localhost:3001/cls/search?region=${Region}&topic_name=${TopicName}&logset
 
 # 仪表盘页面：将以下网址中的 ${dashboardId} 替换为仪表盘ID，即可访问。
 http://localhost:3001/cls/dashboard/d?id=${dashboardId}&time=now-7d,now
+
+# DataSight管理页：
+http://localhost:3001/cls/datasight
 ```
 地域参数格式为`ap-shanghai`, 检索页面参数设置请参考[检索页面参数设置](https://cloud.tencent.com/document/product/614/39331)
 
