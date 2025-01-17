@@ -5,6 +5,7 @@ import { getCapiModules } from './modules/capi';
 import { ClipboardJs } from './modules/clipboard';
 import { getConstantsModules } from './modules/constants';
 import { getManagerModules } from './modules/manager';
+import { mfaModules } from './modules/mfa';
 import { getRouterModules } from './modules/router';
 import { tipsModules } from './modules/tips';
 import { utilModules } from './modules/util';
@@ -159,6 +160,7 @@ export function setup({
     ...mergeBuildInModules(utilModules, modules),
     ...mergeBuildInModules(getRouterModules(history), modules),
     ...mergeBuildInModules(getManagerModules(capi), modules),
+    ...mergeBuildInModules(mfaModules, modules),
     clipboard: ClipboardJs,
   };
 
