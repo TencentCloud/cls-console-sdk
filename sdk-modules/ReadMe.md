@@ -17,6 +17,8 @@
 
 1. 参考[AppService](../capi-forward/src/app.service.ts)中内容，实现 doCApiRequest 方法，返回指定参数格式的内容（格式为 {Response: ...} 对象 ）。
 
+   (可选) 可参考 text/event-stream 部分，支持转发 SSE 云API接口。
+
    当前项目使用了腾讯云Nodejs SDK 中的 doRequestWithSign3 方法，处理接口的请求签名生成。
 
    其他语言实现过程可使用 [腾讯云SDK介绍](https://cloud.tencent.com/document/sdk/Description) 完成对应的签名行为。
