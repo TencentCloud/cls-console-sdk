@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { Response, Request } from 'express';
-import * as bcryptjs from 'bcryptjs';
-import { AppService } from './app.service';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as bcryptjs from 'bcryptjs';
+import { Response, Request } from 'express';
+
+import { AppService } from './app.service';
 
 @Controller('/clsApi')
 export class AppController {
@@ -10,6 +19,10 @@ export class AppController {
     private readonly appService: AppService,
     private readonly configService: ConfigService,
   ) {}
+
+  getHello(): string {
+    return 'Hello World!';
+  }
 
   @Get('/test')
   testRequest(@Req() request: Request): any {
@@ -40,7 +53,7 @@ export class AppController {
         data: 'failed',
       };
     }
-    const envList = ['CLS_DEPLOYMENT_HOST'];
+    const envList = ['CLS_DEPLOYMENT_HOST', 'CLS_SUPPORT_SSE'];
 
     try {
       return {
@@ -60,6 +73,7 @@ export class AppController {
   }
 
   @Post('/forward')
+  @HttpCode(200)
   capiRequest(@Req() request: Request, @Body() body): any {
     if (!this.isRequestLoggedIn(request)) {
       return {
@@ -89,17 +103,16 @@ export class AppController {
   isLog(@Req() request: Request, @Res({ passthrough: true }) res: Response) {
     if (this.isRequestLoggedIn(request)) {
       return { data: 'pass' };
-    } else {
-      // remove cookie
-      res.cookie('demo-token', '', {
-        sameSite: 'none',
-        secure: true,
-        maxAge: 0,
-      });
-      return {
-        data: 'failed',
-      };
     }
+    // remove cookie
+    res.cookie('demo-token', '', {
+      sameSite: 'none',
+      secure: true,
+      maxAge: 0,
+    });
+    return {
+      data: 'failed',
+    };
   }
 
   @Post('/user/login')
@@ -111,19 +124,18 @@ export class AppController {
         code: 401,
         data: 'failed',
       };
-    } else {
-      const exp = new Date();
-      const EXPIRES_DAYS = 0.2;
-      const expires = exp.setTime(
-        exp.getTime() + EXPIRES_DAYS * 24 * 60 * 60 * 1000,
-      );
-      res.cookie('demo-token', capiPassword, {
-        sameSite: 'lax',
-        expires: new Date(expires),
-      });
-      return {
-        data: 'pass',
-      };
     }
+    const exp = new Date();
+    const EXPIRES_DAYS = 0.2;
+    const expires = exp.setTime(
+      exp.getTime() + EXPIRES_DAYS * 24 * 60 * 60 * 1000,
+    );
+    res.cookie('demo-token', capiPassword, {
+      sameSite: 'lax',
+      expires: new Date(expires),
+    });
+    return {
+      data: 'pass',
+    };
   }
 }

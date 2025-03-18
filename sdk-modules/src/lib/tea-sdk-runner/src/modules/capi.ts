@@ -105,6 +105,11 @@ export interface RequestOptions {
    * @default true
    */
   tipLoading?: boolean;
+
+  /**
+   * @description 请求中断信号量
+   */
+  signal?: AbortSignal;
 }
 
 // 通用 promise 合并

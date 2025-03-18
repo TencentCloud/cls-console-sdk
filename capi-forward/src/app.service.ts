@@ -1,12 +1,15 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http/http_connection';
-import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
-import { IAPIErrorResponse, IApiResponse } from './types';
+import { Injectable, Logger, MessageEvent } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { from, isObservable, map, Observable } from 'rxjs';
 import {
   ClientConfig,
   Credential,
 } from 'tencentcloud-sdk-nodejs/src/common/interface';
+import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
+import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http/http_connection';
+import { SSEResponseModel } from 'tencentcloud-sdk-nodejs/tencentcloud/common/sse_response_model';
+
+import { IAPIErrorResponse, IApiResponse } from './types';
 
 type ResponseData = any;
 interface IApiRequestParams {
@@ -53,9 +56,12 @@ export class AppService {
 
   async doCApiRequest(
     param: IApiRequestParams,
-  ): Promise<IApiResponse | IAPIErrorResponse> {
+  ): Promise<IApiResponse | IAPIErrorResponse | Observable<MessageEvent>> {
     try {
       const response = await this.doRequestWithSign3(param);
+      if (isObservable(response)) {
+        return response as Observable<MessageEvent>;
+      }
       return {
         Response: response,
       };
@@ -85,7 +91,7 @@ export class AppService {
     version,
     language,
   }: IApiRequestParams): Promise<ResponseData> {
-    const clientConfig = this.clientConfig;
+    const { clientConfig } = this;
     const { profile, credential } = clientConfig;
 
     const serviceName = String(service).replace(/[^0-9a-zA-Z]/g, '');
@@ -111,16 +117,16 @@ export class AppService {
 
     try {
       res = await HttpConnection.doRequestWithSign3({
-        region: region,
+        region,
         data: data || '',
-        action: action,
+        action,
         service: serviceName,
-        version: version,
+        version,
 
         method: profile.httpProfile.reqMethod,
         timeout: profile.httpProfile.reqTimeout * 1000,
         language: capiLanguage,
-        url: url,
+        url,
         multipart: clientConfig.other.multipart,
         requestClient: clientConfig.other.requestClient,
 
@@ -131,6 +137,27 @@ export class AppService {
     } catch (e) {
       throw new TencentCloudSDKHttpException(e.message);
     }
+
+    // sse
+    if (res.headers?.get('content-type') === 'text/event-stream') {
+      const sseResponseModel = new SSEResponseModel(res.body);
+      const obs = from(sseResponseModel[Symbol.asyncIterator]());
+      return obs.pipe(
+        map((chunk) => {
+          const nestMessageEvent: MessageEvent = {
+            data: chunk.data,
+            id: chunk.id,
+            type: chunk.event,
+            retry: chunk.retry,
+          };
+          try {
+            nestMessageEvent.data = JSON.parse(chunk.data);
+          } catch (e) {}
+          return nestMessageEvent;
+        }),
+      );
+    }
+    // json
     return AppService.parseResponse(res);
   }
 

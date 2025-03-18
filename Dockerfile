@@ -1,4 +1,4 @@
-FROM node:16-alpine as builder
+FROM node:20-alpine as builder
 
 LABEL service=cls_console_sdk
 
@@ -7,7 +7,7 @@ WORKDIR /BUILD
 COPY . /BUILD
 
 RUN npm config set registry "http://mirrors.tencent.com/npm/" --global
-RUN npm i -g pnpm@8
+RUN npm i -g pnpm@9
 RUN pnpm install && cd ./capi-forward && pnpm install && cd ../sdk-modules && pnpm install && cd ../
 RUN pnpm run build
 

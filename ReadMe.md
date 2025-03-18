@@ -29,6 +29,8 @@ secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #demoPassword=123456
 # 独立部署所在域名，设置后页面内所有跳转默认使用该域名
 #CLS_DEPLOYMENT_HOST=clsiframe.com
+# 独立部署的后端服务是否支持转发SSE云API接口
+#CLS_SUPPORT_SSE=true
 ```
 
 ## 部署项目
@@ -41,8 +43,8 @@ secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 
 ### Node.js 运行方案
-> Node 版本要求最低 14， 最佳实践为 16，因为使用了某些高级语法，旧版本 Node 不支持。 
-1. 使用 pnpm 安装依赖。
+> Node版本要求 >= 20。
+1. 使用 pnpm 安装依赖，版本 >= 9。
 > 如未使用 pnpm，请先 [安装](https://pnpm.io/zh/installation) 。
 >
 > 在项目根目录执行 `pnpm install -r` 命令安装依赖。

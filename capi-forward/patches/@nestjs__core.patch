@@ -1,0 +1,31 @@
+diff --git a/router/router-execution-context.js b/router/router-execution-context.js
+index 1a0304fff799a166439d8f4016f569c0b82ac5e6..a72518a4feedad1e27edf67903ea6baaf92abe2e 100644
+--- a/router/router-execution-context.js
++++ b/router/router-execution-context.js
+@@ -170,7 +170,12 @@ class RouterExecutionContext {
+                 this.responseController.sse(result, res.raw || res, req.raw || req, { additionalHeaders: res.getHeaders?.() });
+             };
+         }
+-        return async (result, res) => {
++        return async (result, res, req) => {
++            if (req.body?.data?.Stream === true) {
++                this.responseController.sse(result, res.raw || res, req.raw || req, { additionalHeaders: res.getHeaders?.() });
++                return;
++            }
++
+             result = await this.responseController.transformToResult(result);
+             !isResponseHandled &&
+                 (await this.responseController.apply(result, res, httpStatusCode));
+diff --git a/router/sse-stream.js b/router/sse-stream.js
+index 44f76d96bd68703391f0666b67ba877cc92e9600..10f6aa41720311d9144a46fe25b9b6c7ebaf2386 100644
+--- a/router/sse-stream.js
++++ b/router/sse-stream.js
+@@ -51,7 +51,7 @@ class SseStream extends stream_1.Transform {
+             });
+             destination.flushHeaders?.();
+         }
+-        destination.write('\n');
++        // destination.write('\n');
+         return super.pipe(destination, options);
+     }
+     _transform(message, encoding, callback) {
