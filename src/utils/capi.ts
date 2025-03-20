@@ -51,7 +51,7 @@ export async function postForwardData(url = '', data = {}, options?: RequestOpti
               subscriber.complete();
             },
             onerror(err) {
-              subscriber.error(err);
+              throw err; // rethrow to stop the operation
             },
             openWhenHidden: true,
             fetch: self.fetch,
