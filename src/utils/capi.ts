@@ -1,5 +1,5 @@
 import { EventSourceMessage, EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source';
-import { isObservable, Observable } from 'rxjs';
+import { catchError, isObservable, Observable } from 'rxjs';
 
 import { CAPIRequest } from '@tencent/cls-sdk-modules';
 import { RequestOptions } from '@tencent/tea-sdk-runner/lib/modules/capi';
@@ -18,9 +18,9 @@ export async function postForwardData(url = '', data = {}, options?: RequestOpti
   const fetchUrl = capiForwardUrl + url;
   // sse
   if ((data as any)?.data?.Stream === true) {
-    return new Promise((resolve, reject) => {
-      try {
-        const obs = new Observable<EventSourceMessage>((subscriber) => {
+    return new Promise((resolve) => {
+      resolve(
+        new Observable<EventSourceMessage>((subscriber) => {
           fetchEventSource(fetchUrl, {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             mode: 'same-origin', // no-cors, *cors, same-origin
@@ -59,11 +59,21 @@ export async function postForwardData(url = '', data = {}, options?: RequestOpti
           }).catch((e) => {
             subscriber.error(e);
           });
-        });
-        resolve(obs);
-      } catch (e) {
-        reject(e);
-      }
+        }).pipe(
+          catchError((error) => {
+            if (error?.Response?.Error) {
+              const err = error?.Response?.Error;
+              throw {
+                code: err.Code,
+                name: err.Code,
+                message: err.Message,
+                data: error,
+              };
+            }
+            throw error;
+          }),
+        ),
+      );
     });
   }
   // json
