@@ -1,4 +1,4 @@
-import moduleCss from 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import Cookie from 'js-cookie';
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Modal } from 'react-bootstrap';
@@ -52,7 +52,7 @@ const LoginModal = (props: {
   const { showModal, pwd, setPwd, onHide, onConfirm } = props;
 
   return (
-    <Modal onHide={onHide} show={showModal} className={moduleCss}>
+    <Modal onHide={onHide} show={showModal}>
       <Modal.Header closeButton>
         <Modal.Title>请输入密码</Modal.Title>
       </Modal.Header>

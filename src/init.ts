@@ -27,6 +27,7 @@ export const verifyLogin = (forceUpdate: () => void, language?: 'zh' | 'en') =>
         }
         return { isLoggedIn: true };
       }
+      return { isLoggedIn: false };
     })
     .catch((err) => {
       console.error(err);
