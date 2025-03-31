@@ -9,8 +9,9 @@ COPY . /BUILD
 RUN npm config set registry "http://mirrors.tencent.com/npm/" --global
 RUN npm i -g pnpm@9
 RUN pnpm install && cd ./capi-forward && pnpm install && cd ../sdk-modules && pnpm install && cd ../
-ENV NODE_ENV production
 RUN pnpm run build
+
+ENV NODE_ENV production
 
 EXPOSE 3001
 
