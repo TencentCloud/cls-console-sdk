@@ -4,7 +4,7 @@ import { from, isObservable, map, Observable } from 'rxjs';
 import {
   ClientConfig,
   Credential,
-} from 'tencentcloud-sdk-nodejs/src/common/interface';
+} from 'tencentcloud-sdk-nodejs/tencentcloud/common/interface';
 import TencentCloudSDKHttpException from 'tencentcloud-sdk-nodejs/tencentcloud/common/exception/tencent_cloud_sdk_exception';
 import { HttpConnection } from 'tencentcloud-sdk-nodejs/tencentcloud/common/http/http_connection';
 import { SSEResponseModel } from 'tencentcloud-sdk-nodejs/tencentcloud/common/sse_response_model';
