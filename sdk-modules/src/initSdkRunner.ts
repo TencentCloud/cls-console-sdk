@@ -333,6 +333,10 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
           Route: 'global-css-sdk',
           Type: 'product.sdk',
         },
+        {
+          Route: 'region-sdk',
+          Type: 'product.sdk',
+        },
       ],
     },
   });
