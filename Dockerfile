@@ -7,7 +7,7 @@ WORKDIR /BUILD
 COPY . /BUILD
 
 RUN npm config set registry "http://mirrors.tencent.com/npm/" --global
-RUN npm i -g pnpm@9
+RUN npm i -g pnpm@9.15.0
 RUN pnpm install && cd ./capi-forward && pnpm install && cd ../sdk-modules && pnpm install && cd ../
 RUN pnpm run build
 

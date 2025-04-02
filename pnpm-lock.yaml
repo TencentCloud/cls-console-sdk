@@ -43,7 +43,7 @@ importers:
         version: 17.0.2
       react-bootstrap:
         specifier: ^2.10.9
-        version: 2.10.9(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
+        version: 2.10.9(@types/react@17.0.52)(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       react-dom:
         specifier: ^17.0.2
         version: 17.0.2(react@17.0.2)
@@ -82,11 +82,11 @@ importers:
         specifier: ^20.17.28
         version: 20.17.28
       '@types/react':
-        specifier: ^17.0.85
-        version: 17.0.85
+        specifier: 17.0.52
+        version: 17.0.52
       '@types/react-dom':
-        specifier: ^17.0.26
-        version: 17.0.26(@types/react@17.0.85)
+        specifier: 17.0.18
+        version: 17.0.18
       '@types/react-router':
         specifier: ^5.1.20
         version: 5.1.20
@@ -830,13 +830,8 @@ packages:
   '@types/prop-types@15.7.14':
     resolution: {integrity: sha512-gNMvNH49DJ7OJYv+KAKn0Xp45p8PLl6zo2YnvDIbTd4J6MER2BmWN49TG7n9LvkyihINxeKW8+3bfS2yDC9dzQ==}
 
-  '@types/prop-types@15.7.5':
-    resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
-
-  '@types/react-dom@17.0.26':
-    resolution: {integrity: sha512-Z+2VcYXJwOqQ79HreLU/1fyQ88eXSSFh6I3JdrEHQIfYSI0kCQpTGvOrbE6jFGGYXKsHuwY9tBa/w5Uo6KzrEg==}
-    peerDependencies:
-      '@types/react': ^17.0.0
+  '@types/react-dom@17.0.18':
+    resolution: {integrity: sha512-rLVtIfbwyur2iFKykP2w0pl/1unw26b5td16d5xMgp7/yjTHomkyxPYChFoCr/FtEX1lN9wY6lFj1qvKdS5kDw==}
 
   '@types/react-router-dom@5.3.3':
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
@@ -849,8 +844,8 @@ packages:
     peerDependencies:
       '@types/react': '*'
 
-  '@types/react@17.0.85':
-    resolution: {integrity: sha512-5oBDUsRDsrYq4DdyHaL99gE1AJCfuDhyxqF6/55fvvOIRkp1PpKuwJ+aMiGJR+GJt7YqMNclPROTHF20vY2cXA==}
+  '@types/react@17.0.52':
+    resolution: {integrity: sha512-vwk8QqVODi0VaZZpDXQCmEmiOuyjEFPY7Ttaw5vjM112LOq37yz1CDJGrRJwA1fYEq4Iitd5rnjd1yWAc/bT+A==}
 
   '@types/scheduler@0.16.2':
     resolution: {integrity: sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==}
@@ -4047,30 +4042,28 @@ snapshots:
 
   '@types/prop-types@15.7.14': {}
 
-  '@types/prop-types@15.7.5': {}
-
-  '@types/react-dom@17.0.26(@types/react@17.0.85)':
+  '@types/react-dom@17.0.18':
     dependencies:
-      '@types/react': 17.0.85
+      '@types/react': 17.0.52
 
   '@types/react-router-dom@5.3.3':
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 17.0.85
+      '@types/react': 17.0.52
       '@types/react-router': 5.1.20
 
   '@types/react-router@5.1.20':
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 17.0.85
+      '@types/react': 17.0.52
 
-  '@types/react-transition-group@4.4.12(@types/react@17.0.85)':
+  '@types/react-transition-group@4.4.12(@types/react@17.0.52)':
     dependencies:
-      '@types/react': 17.0.85
+      '@types/react': 17.0.52
 
-  '@types/react@17.0.85':
+  '@types/react@17.0.52':
     dependencies:
-      '@types/prop-types': 15.7.5
+      '@types/prop-types': 15.7.14
       '@types/scheduler': 0.16.2
       csstype: 3.1.1
 
@@ -6007,13 +6000,13 @@ snapshots:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
 
-  react-bootstrap@2.10.9(@types/react@17.0.85)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
+  react-bootstrap@2.10.9(@types/react@17.0.52)(react-dom@17.0.2(react@17.0.2))(react@17.0.2):
     dependencies:
       '@babel/runtime': 7.27.0
       '@restart/hooks': 0.4.16(react@17.0.2)
       '@restart/ui': 1.9.4(react-dom@17.0.2(react@17.0.2))(react@17.0.2)
       '@types/prop-types': 15.7.14
-      '@types/react-transition-group': 4.4.12(@types/react@17.0.85)
+      '@types/react-transition-group': 4.4.12(@types/react@17.0.52)
       classnames: 2.3.2
       dom-helpers: 5.2.1
       invariant: 2.2.4
@@ -6025,7 +6018,7 @@ snapshots:
       uncontrollable: 7.2.1(react@17.0.2)
       warning: 4.0.3
     optionalDependencies:
-      '@types/react': 17.0.85
+      '@types/react': 17.0.52
 
   react-dom@17.0.2(react@17.0.2):
     dependencies:
@@ -6624,7 +6617,7 @@ snapshots:
   uncontrollable@7.2.1(react@17.0.2):
     dependencies:
       '@babel/runtime': 7.27.0
-      '@types/react': 17.0.85
+      '@types/react': 17.0.52
       invariant: 2.2.4
       react: 17.0.2
       react-lifecycles-compat: 3.0.4
