@@ -198,6 +198,7 @@ export declare const SearchAppHideParamKeyMap: {
   hideQueryRecommend: { type: LocationParseType.boolean };
   hideLogDisplayConfig: { type: LocationParseType.boolean };
   hideFullScreen: { type: LocationParseType.boolean };
+  hideExportSqlResult: { type: LocationParseType.boolean };
 };
 
 export interface ISdkSearchPageControl {
