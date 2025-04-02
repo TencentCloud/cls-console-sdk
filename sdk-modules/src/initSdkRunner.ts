@@ -114,6 +114,8 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       // 如果需要配置使用特定的SDK版本，可以在这里配置
       // js: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/cls.zh.8afc73b631.js',
       // css: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/cls.zh.642db74dc1.css',
+      // menusJs: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/menus.zh.90a77ee835.js?max_age=31536000',
+      // menusCss: 'https://cloudcache.tencent-cloud.com/qcloud/tea/sdk/menus.zh.8971819ebe.css?max_age=31536000',
     } as any,
     loginInfo = {},
     history,
@@ -187,6 +189,11 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
       config.js = version.js;
       config.css = version.css;
     }
+  }
+
+  if (config.menusJs && config.menusCss) {
+    sdkConfigs['menus-sdk'].js = config.menusJs;
+    sdkConfigs['menus-sdk'].css = config.menusCss;
   }
 
   // 设置Moment语言版本
