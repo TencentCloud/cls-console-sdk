@@ -70,7 +70,6 @@ export function SearchPage({ history }: { history: History }) {
               topic_name: pageParams.topicName,
               query: pageParams.query,
               time: pageParams.time,
-              filter: pageParams.filter,
             })}
           </p>
           <p>{JSON.stringify(hideParams)}</p>

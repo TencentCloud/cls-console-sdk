@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IDashboardAppHideParams, DashboardPageRouteSearchParams } from '../../../patch';
+import { IDashboardAppHideParams, DashboardPageRouteSearchParams, ThemeName } from '../../../patch';
 export interface ISdkDashboardPageControl {
   updatePageParams: (pageParams: Partial<ISdkDashboardPageProps['pageParams']>) => void;
   updateHideParams: (hideParams: Partial<ISdkDashboardPageProps['hideParams']>) => void;
@@ -16,5 +16,6 @@ export interface ISdkDashboardPageProps {
   lazyLoadContainer?: string | Element;
   /** 当页面参数变更时通知外界 */
   onPageParamsUpdate?: (pageParams: Partial<ISdkDashboardPageProps['pageParams']>) => void;
+  theme?: ThemeName;
 }
-export declare function SdkDashboardPage(props: ISdkDashboardPageProps): JSX.Element;
+export declare function SdkDashboardPage(props: ISdkDashboardPageProps): React.JSX.Element;
