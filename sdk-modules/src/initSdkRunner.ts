@@ -274,6 +274,16 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
     CSS: string;
   }[]
 > {
+  const rainbowGroup = 'cls_console_sdk_console_queries';
+  const rainbowMap = await capi({
+    regionId: 1,
+    serviceType: 'cls',
+    cmd: 'DescribeRainbowConfigs',
+    data: { Version: '2020-10-16', Groups: [rainbowGroup], Product: 'cls', Type: 'table' },
+  }).then(({ Response: result }) =>
+    Object.fromEntries(result.RainbowTables.map((item) => [item.Group, item.Rows.map((row) => safeJsonParse(row))])),
+  );
+
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     Response: { Results },
@@ -298,46 +308,14 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
     cmd: 'DescribeConsoleConfigVersion',
     data: {
       Version: '2022-02-15',
-      Limit: 100,
+      Limit: 1000,
       Offset: 0,
-      Queries: [
-        {
-          Route: 'cls-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'tag-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'cam-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'menus-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'nps-service-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'help-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'monitor-v2-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'global-css-sdk',
-          Type: 'product.sdk',
-        },
-        {
-          Route: 'region-sdk',
-          Type: 'product.sdk',
-        },
-      ],
+      Queries: rainbowMap[rainbowGroup].map((item) => ({
+        Route: item.Route,
+        Type: item.Type,
+        Site: item.Site ? Number(item.Site) : undefined,
+        Lang: item.Lang ? Number(item.Lang) : undefined,
+      })),
     },
   });
   return Results;
