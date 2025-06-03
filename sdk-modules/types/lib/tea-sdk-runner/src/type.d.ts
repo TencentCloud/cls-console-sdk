@@ -17,6 +17,17 @@ export interface SDKRunnerSDKEntry {
 export interface SDKRunnerEnvModules {
     [moduleId: string]: any;
 }
+export interface RegionConstants {
+    REGIONIDMAP: Record<string, string>;
+    REGIONMAP: Record<string, string>;
+    REGIONNAMES: Record<string, string>;
+    REGIONORDER: number[];
+    REGIONAREAMAP: Record<string, {
+        area: string;
+        name: string;
+    }>;
+    ZONEIDMAP: Record<string, string>;
+}
 export interface SDKRunnerSetupOptions {
     /**
      * 需要使用的 SDK 列表
@@ -41,4 +52,5 @@ export interface SDKRunnerSetupOptions {
     history?: History;
     language?: 'zh' | 'en';
     includeGlobalCss?: boolean;
+    regionConstants?: RegionConstants;
 }

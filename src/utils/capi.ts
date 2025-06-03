@@ -1,10 +1,9 @@
 import { EventSourceMessage, EventStreamContentType, fetchEventSource } from '@microsoft/fetch-event-source';
 import { catchError, isObservable, Observable } from 'rxjs';
 
-import { CAPIRequest } from '@tencent/cls-sdk-modules';
+import { CAPIRequest, DEFAULTREGIONIDMAP } from '@tencent/cls-sdk-modules';
 import { RequestOptions } from '@tencent/tea-sdk-runner/lib/modules/capi';
 
-import { REGIONIDMAP } from './constants';
 import { IApiError, IApiResponse } from './types';
 
 const capiForwardUrl = '/clsApi';
@@ -108,6 +107,7 @@ export const CApiForward: CAPIRequest = async function (
   // console.log('CApiForward', body);
   try {
     const { Version, ...restData } = body.data;
+    const REGIONIDMAP = window.TeaSDKRunner?.constants?.REGIONIDMAP || DEFAULTREGIONIDMAP;
     const param: {
       action: string;
       data: any;

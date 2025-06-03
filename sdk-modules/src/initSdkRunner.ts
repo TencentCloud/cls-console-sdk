@@ -1,8 +1,9 @@
 import type { History } from 'history';
+import { flatten } from 'lodash-es';
 
 import moment from './lib/moment';
 import { setup } from './lib/tea-sdk-runner/src';
-import { SDKRunnerSetupOptions } from './lib/tea-sdk-runner/src/type';
+import { RegionConstants, SDKRunnerSetupOptions } from './lib/tea-sdk-runner/src/type';
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
 
 window.moment = moment;
@@ -129,14 +130,16 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
   const promises: Promise<any>[] = [];
 
   // 加载SDK最新版本号
-  promises.push(GetConsoleConfigVersion(capi));
+  promises.push(getConsoleConfigVersion(capi));
+  // 加载地域常量
+  promises.push(initRegionConstants(capi));
   // 加载用户ID信息
   const needInitLoginInfo = !(loginInfo?.appId && loginInfo?.ownerUin && loginInfo?.loginUin && loginInfo?.area);
   if (needInitLoginInfo) {
     promises.push(DescribeCurrentUserDetails(capi));
   }
   // 并发发起请求
-  const [configVersionResult, userIdInfo] = await Promise.all(promises);
+  const [configVersionResult, regionConstants, userIdInfo] = await Promise.all(promises);
 
   if (needInitLoginInfo) {
     loginInfo.appId = Number(userIdInfo.AppId?.[0]);
@@ -229,6 +232,7 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
     history,
     language,
     includeGlobalCss,
+    regionConstants,
   });
 }
 
@@ -262,7 +266,7 @@ async function DescribeCurrentUserDetails(capi: SDKRunnerSetupOptions['capi']): 
   return res.Response;
 }
 
-async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Promise<
+async function getConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Promise<
   {
     Date: string;
     Site: PlatformSite;
@@ -319,4 +323,32 @@ async function GetConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Pro
     },
   });
   return Results;
+}
+
+async function initRegionConstants(capi: SDKRunnerSetupOptions['capi']): Promise<RegionConstants> {
+  try {
+    const { Response: response } = await capi({
+      regionId: 1,
+      serviceType: 'region',
+      cmd: 'DescribeRegionsAndZones',
+      data: { Version: '2022-06-27' },
+    });
+    const resourceRegionSet = response.ResourceRegionSet || [];
+    const result: RegionConstants = {
+      REGIONIDMAP: Object.fromEntries(resourceRegionSet.map((region) => [region.RegionId, region.Region])),
+      REGIONMAP: Object.fromEntries(resourceRegionSet.map((region) => [region.RegionId, region.RegionShortName])),
+      REGIONNAMES: Object.fromEntries(resourceRegionSet.map((region) => [region.RegionId, region.RegionName])),
+      REGIONORDER: resourceRegionSet.sort((a, b) => b.Weight - a.Weight).map((item) => item.RegionId),
+      REGIONAREAMAP: Object.fromEntries(
+        resourceRegionSet.map((region) => [region.Region, { area: region.Location, name: region.RegionName }]),
+      ),
+      ZONEIDMAP: Object.fromEntries(
+        flatten(resourceRegionSet.map((region) => region.ResourceZoneSet.map((zone) => [zone.ZoneId, zone.Zone]))),
+      ),
+    };
+    return result;
+  } catch (error) {
+    // 如果报错就算了，用本地兜底配置
+    return null;
+  }
 }

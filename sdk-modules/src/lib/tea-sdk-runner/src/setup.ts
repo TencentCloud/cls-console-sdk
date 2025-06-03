@@ -112,6 +112,7 @@ export function setup({
   history,
   language,
   includeGlobalCss,
+  regionConstants,
 }: SDKRunnerSetupOptions) {
   // tips 包含在 menus 中
   // @ts-ignore
@@ -153,7 +154,7 @@ export function setup({
   // eslint-disable-next-line no-param-reassign
   modules = {
     ...modules,
-    ...mergeBuildInModules(getConstantsModules(language), modules),
+    ...mergeBuildInModules(getConstantsModules(language, regionConstants), modules),
     ...mergeBuildInModules(getCapiModules(capi), modules),
     ...mergeBuildInModules(tipsModules, modules),
     ...mergeBuildInModules(appUtilModules, modules),
