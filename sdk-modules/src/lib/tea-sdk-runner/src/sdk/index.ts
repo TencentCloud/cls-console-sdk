@@ -1,13 +1,13 @@
 import { SDKRunnerSDKEntry } from '../type';
 
-const config: SDKRunnerSDKEntry[] = [];
+const configs: SDKRunnerSDKEntry[] = [];
 
 export function register(sdk: SDKRunnerSDKEntry) {
-  config.push(sdk);
+  configs.push(sdk);
 }
 
 function getSDKEntry(name: string) {
-  return config.find((i) => i.name === name);
+  return configs.find((i) => i.name === name);
 }
 
 export function initSDKImporter() {

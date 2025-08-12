@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-assign,@typescript-eslint/no-this-alias,@typescript-eslint/no-unused-vars */
 /**
  * Sea.js 2.2.2 | seajs.org/LICENSE.md
  */
@@ -7,12 +8,116 @@ export default function seajs(global, undefined) {
     return;
   }
 
-  var seajs = (global.seajs = {
+  // 通过 XHR 重新加载资源
+  // type - css/js
+  // url - 资源地址
+  // callback - 回调
+  function retryViaXhr(type, url, callback) {
+    let start;
+    const URL = window.URL || window.webkitURL;
+    const xhr = new XMLHttpRequest();
+    let bytes;
+    let rtt;
+    let cost;
+    let speed;
+    let server;
+    let logid;
+    const notify = function (errorMessage) {
+      callback({
+        type,
+        url,
+        success: !errorMessage,
+        error: errorMessage,
+        status: +xhr.status,
+        rurl: xhr.responseURL,
+        bytes,
+        rtt,
+        cost,
+        speed,
+        server,
+        logid,
+      });
+    };
+    xhr.onerror = xhr.onload = function (evt) {
+      if (+xhr.status !== 200) {
+        return notify(`ERR_${xhr.status}`);
+      }
+      const memoryUrl = URL.createObjectURL(
+        new Blob([xhr.responseText], {
+          type: type === 'js' ? 'text/javascript' : 'text/css',
+        }),
+      );
+      if (type === 'js') {
+        let script = document.createElement('script');
+        script.onload = script.onerror = function (evt) {
+          try {
+            document.body.removeChild(script);
+            script.onload = script.onerror = null;
+            script = null;
+            URL.revokeObjectURL(memoryUrl);
+          } catch (err) {}
+          if (evt.type === 'load') {
+            notify(null);
+          } else {
+            notify(`Cannot load ${memoryUrl} (source ${url})`);
+          }
+        };
+        script.src = memoryUrl;
+        document.body.appendChild(script);
+      } else if (type === 'css') {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = memoryUrl;
+        link.setAttribute('data-origin-href', url);
+        document.head.appendChild(link);
+        setTimeout(() => {
+          notify(null);
+          URL.revokeObjectURL(memoryUrl);
+        }, 10);
+      } else {
+        URL.revokeObjectURL(memoryUrl);
+      }
+    };
+    xhr.onreadystatechange = function () {
+      switch (xhr.readyState) {
+        case 1: {
+          start = +new Date();
+          break;
+        }
+        case 2: {
+          rtt = +new Date() - start;
+          break;
+        }
+        case 4: {
+          rtt = rtt || 0;
+          cost = Math.max(1, +new Date() - start - rtt);
+          if (/img\.qcloud\.com|imgcache\.qq\.com/.test(xhr.responseURL || url)) {
+            bytes = +xhr.getResponseHeader('content-length');
+            server = xhr.getResponseHeader('server_ip');
+            logid = xhr.getResponseHeader('x-nws-log-uuid');
+          }
+          if (bytes > 0) {
+            // 单位为 bytes/s
+            speed = cost > 0 ? Math.round((bytes / cost) * 1000) : 0;
+          }
+          break;
+        }
+      }
+    };
+    const addSeed = function (url) {
+      const joiner = url.indexOf('?') > -1 ? '&' : '?';
+      return [url, `r=${Math.random()}`].join(joiner);
+    };
+    xhr.open('GET', addSeed(url), true);
+    xhr.send(null);
+  }
+
+  const seajs = (global.seajs = {
     // The current version of Sea.js being used
-    version: "2.2.2",
+    version: '2.2.2',
   });
 
-  var data = (seajs.data = {});
+  const data = (seajs.data = {});
 
   /**
    * util-lang.js - The minimal language enhancement
@@ -20,29 +125,29 @@ export default function seajs(global, undefined) {
 
   function isType(type) {
     return function (obj) {
-      return {}.toString.call(obj) == "[object " + type + "]";
+      return {}.toString.call(obj) == `[object ${type}]`;
     };
   }
 
-  var isObject = isType("Object");
-  var isString = isType("String");
-  var isArray = Array.isArray || isType("Array");
-  var isFunction = isType("Function");
+  const isObject = isType('Object');
+  const isString = isType('String');
+  const isArray = Array.isArray || isType('Array');
+  const isFunction = isType('Function');
 
-  var _cid = 0;
+  let _cid = 0;
   function cid() {
-    return _cid++;
+    return (_cid += 1);
   }
 
   /**
    * util-events.js - The minimal events support
    */
 
-  var events = (data.events = {});
+  let events = (data.events = {});
 
   // Bind event
   seajs.on = function (name, callback) {
-    var list = events[name] || (events[name] = []);
+    const list = events[name] || (events[name] = []);
     list.push(callback);
     return seajs;
   };
@@ -57,10 +162,10 @@ export default function seajs(global, undefined) {
       return seajs;
     }
 
-    var list = events[name];
+    const list = events[name];
     if (list) {
       if (callback) {
-        for (var i = list.length - 1; i >= 0; i--) {
+        for (let i = list.length - 1; i >= 0; i--) {
           if (list[i] === callback) {
             list.splice(i, 1);
           }
@@ -75,9 +180,9 @@ export default function seajs(global, undefined) {
 
   // Emit event, firing all bound callbacks. Callbacks receive the same
   // arguments as `emit` does, apart from the event name
-  var emit = (seajs.emit = function (name, data) {
-    var list = events[name],
-      fn;
+  const emit = (seajs.emit = function (name, data) {
+    let list = events[name];
+    let fn;
 
     if (list) {
       // Copy callback lists to prevent modification
@@ -96,11 +201,11 @@ export default function seajs(global, undefined) {
    * util-path.js - The utilities for operating path such as id, uri
    */
 
-  var DIRNAME_RE = /[^?#]*\//;
+  const DIRNAME_RE = /[^?#]*\//;
 
-  var DOT_RE = /\/\.\//g;
-  var DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//;
-  var DOUBLE_SLASH_RE = /([^:/])\/\//g;
+  const DOT_RE = /\/\.\//g;
+  const DOUBLE_DOT_RE = /\/[^/]+\/\.\.\//;
+  const DOUBLE_SLASH_RE = /([^:/])\/\//g;
 
   // Extract the directory portion of a path
   // dirname("a/b/c.js?t=123#xx/zz") ==> "a/b/"
@@ -113,15 +218,15 @@ export default function seajs(global, undefined) {
   // realpath("http://test.com/a//./b/../c") ==> "http://test.com/a/c"
   function realpath(path) {
     // /a/b/./c/./d ==> /a/b/c/d
-    path = path.replace(DOT_RE, "/");
+    path = path.replace(DOT_RE, '/');
 
     // a/b/c/../../d  ==>  a/b/../d  ==>  a/d
     while (path.match(DOUBLE_DOT_RE)) {
-      path = path.replace(DOUBLE_DOT_RE, "/");
+      path = path.replace(DOUBLE_DOT_RE, '/');
     }
 
     // a//b/c  ==>  a/b/c
-    path = path.replace(DOUBLE_SLASH_RE, "$1/");
+    path = path.replace(DOUBLE_SLASH_RE, '$1/');
 
     return path;
   }
@@ -130,33 +235,33 @@ export default function seajs(global, undefined) {
   // normalize("path/to/a") ==> "path/to/a.js"
   // NOTICE: substring is faster than negative slice and RegExp
   function normalize(path) {
-    var last = path.length - 1;
-    var lastC = path.charAt(last);
+    const last = path.length - 1;
+    const lastC = path.charAt(last);
 
     // If the uri ends with `#`, just return it without '#'
-    if (lastC === "#") {
+    if (lastC === '#') {
       return path.substring(0, last);
     }
 
-    return path.substring(last - 2) === ".js" ||
-      path.indexOf("?") > 0 ||
-      path.substring(last - 3) === ".css" ||
-      lastC === "/"
+    return path.substring(last - 2) === '.js' ||
+      path.indexOf('?') > 0 ||
+      path.substring(last - 3) === '.css' ||
+      lastC === '/'
       ? path
-      : path + ".js";
+      : `${path}.js`;
   }
 
-  var PATHS_RE = /^([^/:]+)(\/.+)$/;
-  var VARS_RE = /{([^{]+)}/g;
+  const PATHS_RE = /^([^/:]+)(\/.+)$/;
+  const VARS_RE = /{([^{]+)}/g;
 
   function parseAlias(id) {
-    var alias = data.alias;
+    const { alias } = data;
     return alias && isString(alias[id]) ? alias[id] : id;
   }
 
   function parsePaths(id) {
-    var paths = data.paths;
-    var m;
+    const { paths } = data;
+    let m;
 
     if (paths && (m = id.match(PATHS_RE)) && isString(paths[m[1]])) {
       id = paths[m[1]] + m[2];
@@ -166,28 +271,24 @@ export default function seajs(global, undefined) {
   }
 
   function parseVars(id) {
-    var vars = data.vars;
+    const { vars } = data;
 
-    if (vars && id.indexOf("{") > -1) {
-      id = id.replace(VARS_RE, function (m, key) {
-        return isString(vars[key]) ? vars[key] : m;
-      });
+    if (vars && id.indexOf('{') > -1) {
+      id = id.replace(VARS_RE, (m, key) => (isString(vars[key]) ? vars[key] : m));
     }
 
     return id;
   }
 
   function parseMap(uri) {
-    var map = data.map;
-    var ret = uri;
+    const { map } = data;
+    let ret = uri;
 
     if (map) {
-      for (var i = 0, len = map.length; i < len; i++) {
-        var rule = map[i];
+      for (let i = 0, len = map.length; i < len; i++) {
+        const rule = map[i];
 
-        ret = isFunction(rule)
-          ? rule(uri) || uri
-          : uri.replace(rule[0], rule[1]);
+        ret = isFunction(rule) ? rule(uri) || uri : uri.replace(rule[0], rule[1]);
 
         // Only apply the first matched rule
         if (ret !== uri) break;
@@ -197,24 +298,24 @@ export default function seajs(global, undefined) {
     return ret;
   }
 
-  var ABSOLUTE_RE = /^\/\/.|:\//;
-  var ROOT_DIR_RE = /^.*?\/\/.*?\//;
+  const ABSOLUTE_RE = /^\/\/.|:\//;
+  const ROOT_DIR_RE = /^.*?\/\/.*?\//;
 
   function addBase(id, refUri) {
-    var ret;
-    var first = id.charAt(0);
+    let ret;
+    const first = id.charAt(0);
 
     // Absolute
     if (ABSOLUTE_RE.test(id)) {
       ret = id;
     }
     // Relative
-    else if (first === ".") {
+    else if (first === '.') {
       ret = realpath((refUri ? dirname(refUri) : data.cwd) + id);
     }
     // Root
-    else if (first === "/") {
-      var m = data.cwd.match(ROOT_DIR_RE);
+    else if (first === '/') {
+      const m = data.cwd.match(ROOT_DIR_RE);
       ret = m ? m[0] + id.substring(1) : id;
     }
     // Top-level
@@ -223,7 +324,7 @@ export default function seajs(global, undefined) {
     }
 
     // Add default protocol when uri begins with "//"
-    if (ret.indexOf("//") === 0) {
+    if (ret.indexOf('//') === 0) {
       ret = location.protocol + ret;
     }
 
@@ -231,35 +332,34 @@ export default function seajs(global, undefined) {
   }
 
   function id2Uri(id, refUri) {
-    if (!id) return "";
+    if (!id) return '';
 
     id = parseAlias(id);
     id = parsePaths(id);
     id = parseVars(id);
     id = normalize(id);
 
-    var uri = addBase(id, refUri);
+    let uri = addBase(id, refUri);
     uri = parseMap(uri);
 
     return uri;
   }
 
-  var doc = document;
-  var cwd = dirname(doc.URL);
-  var scripts = doc.scripts;
+  const doc = document;
+  const cwd = dirname(doc.URL);
+  const { scripts } = doc;
 
   // Recommend to add `seajsnode` id for the `sea.js` script element
-  var loaderScript =
-    doc.getElementById("seajsnode") || scripts[scripts.length - 1];
+  const loaderScript = doc.getElementById('seajsnode') || scripts[scripts.length - 1];
 
   // When `sea.js` is inline, set loaderDir to current working directory
-  var loaderDir = dirname(getScriptAbsoluteSrc(loaderScript) || cwd);
+  const loaderDir = dirname(getScriptAbsoluteSrc(loaderScript) || cwd);
 
   function getScriptAbsoluteSrc(node) {
     return node.hasAttribute // non-IE6/7
       ? node.src
       : // see http://msdn.microsoft.com/en-us/library/ms536429(VS.85).aspx
-        node.getAttribute("src", 4);
+        node.getAttribute('src', 4);
   }
 
   // For Developers
@@ -270,46 +370,41 @@ export default function seajs(global, undefined) {
    * ref: tests/research/load-js-css/test.html
    */
 
-  var head =
-    doc.head || doc.getElementsByTagName("head")[0] || doc.documentElement;
-  var baseElement = head.getElementsByTagName("base")[0];
+  const head = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement;
+  const baseElement = head.getElementsByTagName('base')[0];
 
-  var IS_CSS_RE = /\.css(?:\?|$)/i;
-  var currentlyAddingScript;
-  var interactiveScript;
+  const IS_CSS_RE = /\.css(?:\?|$)/i;
+  let currentlyAddingScript;
+  let interactiveScript;
 
   // `onload` event is not supported in WebKit < 535.23 and Firefox < 9.0
   // ref:
   //  - https://bugs.webkit.org/show_activity.cgi?id=38995
   //  - https://bugzilla.mozilla.org/show_bug.cgi?id=185236
   //  - https://developer.mozilla.org/en/HTML/Element/link#Stylesheet_load_events
-  var isOldWebKit =
-    +navigator.userAgent.replace(
-      /.*(?:AppleWebKit|AndroidWebKit)\/(\d+).*/,
-      "$1"
-    ) < 536;
+  const isOldWebKit = +navigator.userAgent.replace(/.*(?:AppleWebKit|AndroidWebKit)\/(\d+).*/, '$1') < 536;
 
-  function request(url, callback, charset, crossorigin) {
-    var isCSS = IS_CSS_RE.test(url);
-    var node = doc.createElement(isCSS ? "link" : "script");
+  function request(url, callback, charset, crossorigin, time) {
+    const isCSS = IS_CSS_RE.test(url);
+    const node = doc.createElement(isCSS ? 'link' : 'script');
 
     if (charset) {
-      var cs = isFunction(charset) ? charset(url) : charset;
+      const cs = isFunction(charset) ? charset(url) : charset;
       if (cs) {
         node.charset = cs;
       }
     }
 
     // crossorigin default value is `false`.
-    var cors = isFunction(crossorigin) ? crossorigin(url) : crossorigin;
+    const cors = isFunction(crossorigin) ? crossorigin(url) : crossorigin;
     if (cors !== false) {
       node.crossorigin = cors;
     }
 
-    addOnload(node, callback, isCSS, url);
+    addOnload(node, callback, isCSS, url, time);
 
     if (isCSS) {
-      node.rel = "stylesheet";
+      node.rel = 'stylesheet';
       node.href = url;
     } else {
       node.async = true;
@@ -327,12 +422,22 @@ export default function seajs(global, undefined) {
     currentlyAddingScript = null;
   }
 
-  function addOnload(node, callback, isCSS, url) {
-    var supportOnload = "onload" in node;
+  function addOnload(node, callback, isCSS, url, time) {
+    time = time || 0;
+
+    const resourceLoadTimeoutId = setTimeout(() => {
+      seajs.emit('resource-slow', {
+        type: isCSS ? 'css' : 'js',
+        url: isCSS ? node.href : node.src,
+        retry: time,
+        second: 10,
+      });
+    }, 10000);
+    const supportOnload = 'onload' in node;
 
     // for Old WebKit and Old Firefox
     if (isCSS && (isOldWebKit || !supportOnload)) {
-      setTimeout(function () {
+      setTimeout(() => {
         pollCss(node, callback);
       }, 1); // Begin after node insertion
       return;
@@ -340,37 +445,114 @@ export default function seajs(global, undefined) {
 
     if (supportOnload) {
       node.onload = onload;
-      node.onerror = function () {
-        emit("error", { uri: url, node: node });
-        onload();
+      node.onerror = function (e) {
+        emit('error', { uri: url, node });
+        onload(e);
       };
     } else {
-      node.onreadystatechange = function () {
+      node.onreadystatechange = function (e) {
         if (/loaded|complete/.test(node.readyState)) {
-          onload();
+          onload(e);
         }
       };
     }
 
-    function onload() {
+    function onload(e) {
+      let url = isCSS ? node.href : node.src;
+      // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+      const eventType = e && e.type;
+      clearTimeout(resourceLoadTimeoutId);
+
+      if (eventType === 'error') {
+        const clean = function () {
+          node.onload = node.onerror = node.onreadystatechange = null;
+          try {
+            head.removeChild(a);
+          } catch (err) {}
+          node = null;
+        };
+        const { charset } = node;
+        // 第 1 次：传统重试，附带跨域属性
+        // 第 2 次：传统重试，移除跨域属性
+        // 第 3 次：备用域名重试，移除跨域属性
+        if (time <= 2) {
+          time += 1;
+          setTimeout(() => {
+            if (time === 3) {
+              try {
+                url = url.replace(window.QCCDN_HOST, window.QCCDN_BACKUP_HOST);
+              } catch (err) {}
+            }
+            request(url, callback, charset, url, time);
+          }, 500);
+          console.warn('Retrying %d (classic): %s', time, url);
+          clean();
+          return;
+        }
+        // 第 4 次：XHR 重试，用原域名重试
+        if (time === 3) {
+          time += 1;
+          setTimeout(() => {
+            try {
+              url = url.replace(window.QCCDN_BACKUP_HOST, window.QCCDN_HOST);
+            } catch (err) {}
+            retryViaXhr(isCSS ? 'css' : 'js', url, (result) => {
+              result.retry = time;
+              seajs.emit(result.success ? 'resource-load' : 'resource-error', result);
+              callback();
+            });
+          }, 1000);
+          console.warn('Retrying %d (xhr): %s', time, url);
+          clean();
+          return;
+        }
+      }
+      if (eventType) {
+        seajs.emit(`resource-${eventType}`, {
+          type: isCSS ? 'css' : 'js',
+          url,
+          retry: time,
+        });
+      }
+
+      if (/^(?:loaded|complete|undefined)$/.test(node.readyState)) {
+        // Ensure only run once and handle memory leak in IE
+        node.onload = node.onerror = node.onreadystatechange = null;
+
+        // Remove the script to reduce memory leak
+        if (!isCSS && !data.debug) {
+          head.removeChild(node);
+        }
+
+        // Dereference the node
+        node = null;
+
+        callback();
+      }
+    }
+
+    /* function onload() {
       // Ensure only run once and handle memory leak in IE
-      node.onload = node.onerror = node.onreadystatechange = null;
+      node.onload =
+        node.onerror =
+        node.onreadystatechange = null;
+
 
       // Remove the script to reduce memory leak
       if (!isCSS && !data.debug) {
-        head.removeChild(node);
+       head.removeChild(node);
       }
 
       // Dereference the node
-      node = null;
+      // node = null;
 
       callback();
-    }
+    } */
   }
 
   function pollCss(node, callback) {
-    var sheet = node.sheet;
-    var isLoaded;
+    const { sheet } = node;
+    let isLoaded;
 
     // for WebKit < 536
     if (isOldWebKit) {
@@ -388,13 +570,13 @@ export default function seajs(global, undefined) {
         // The value of `ex.name` is changed from "NS_ERROR_DOM_SECURITY_ERR"
         // to "SecurityError" since Firefox 13.0. But Firefox is less than 9.0
         // in here, So it is ok to just rely on "NS_ERROR_DOM_SECURITY_ERR"
-        if (ex.name === "NS_ERROR_DOM_SECURITY_ERR") {
+        if (ex.name === 'NS_ERROR_DOM_SECURITY_ERR') {
           isLoaded = true;
         }
       }
     }
 
-    setTimeout(function () {
+    setTimeout(() => {
       if (isLoaded) {
         // Place callback here to give time for style rendering
         callback();
@@ -414,15 +596,15 @@ export default function seajs(global, undefined) {
     // could query the script nodes and the one that is in "interactive"
     // mode indicates the current script
     // ref: http://goo.gl/JHfFW
-    if (interactiveScript && interactiveScript.readyState === "interactive") {
+    if (interactiveScript && interactiveScript.readyState === 'interactive') {
       return interactiveScript;
     }
 
-    var scripts = head.getElementsByTagName("script");
+    const scripts = head.getElementsByTagName('script');
 
-    for (var i = scripts.length - 1; i >= 0; i--) {
-      var script = scripts[i];
-      if (script.readyState === "interactive") {
+    for (let i = scripts.length - 1; i >= 0; i--) {
+      const script = scripts[i];
+      if (script.readyState === 'interactive') {
         interactiveScript = script;
         return interactiveScript;
       }
@@ -437,13 +619,14 @@ export default function seajs(global, undefined) {
    * ref: tests/research/parse-dependencies/test.html
    */
 
-  var REQUIRE_RE = /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|\/\*[\S\s]*?\*\/|\/(?:\\\/|[^\/\r\n])+\/(?=[^\/])|\/\/.*|\.\s*require|(?:^|[^$])\brequire\s*\(\s*(["'])(.+?)\1\s*\)/g;
-  var SLASH_RE = /\\\\/g;
+  const REQUIRE_RE =
+    /"(?:\\"|[^"])*"|'(?:\\'|[^'])*'|\/\*[\S\s]*?\*\/|\/(?:\\\/|[^/\r\n])+\/(?=[^/])|\/\/.*|\.\s*require|(?:^|[^$])\brequire\s*\(\s*(["'])(.+?)\1\s*\)/g;
+  const SLASH_RE = /\\\\/g;
 
   function parseDependencies(code) {
-    var ret = [];
+    const ret = [];
 
-    code.replace(SLASH_RE, "").replace(REQUIRE_RE, function (m, m1, m2) {
+    code.replace(SLASH_RE, '').replace(REQUIRE_RE, (m, m1, m2) => {
       if (m2) {
         ret.push(m2);
       }
@@ -456,14 +639,14 @@ export default function seajs(global, undefined) {
    * module.js - The core of module loader
    */
 
-  var cachedMods = (seajs.cache = {});
-  var anonymousMeta;
+  const cachedMods = (seajs.cache = {});
+  let anonymousMeta;
 
-  var fetchingList = {};
-  var fetchedList = {};
-  var callbackList = {};
+  const fetchingList = {};
+  const fetchedList = {};
+  const callbackList = {};
 
-  var STATUS = (Module.STATUS = {
+  const STATUS = (Module.STATUS = {
     // 1 - The `module.uri` is being fetched
     FETCHING: 1,
     // 2 - The meta data has been saved to cachedMods
@@ -493,11 +676,11 @@ export default function seajs(global, undefined) {
 
   // Resolve module.dependencies
   Module.prototype.resolve = function () {
-    var mod = this;
-    var ids = mod.dependencies;
-    var uris = [];
+    const mod = this;
+    const ids = mod.dependencies;
+    const uris = [];
 
-    for (var i = 0, len = ids.length; i < len; i++) {
+    for (let i = 0, len = ids.length; i < len; i++) {
       uris[i] = Module.resolve(ids[i], mod.uri);
     }
     return uris;
@@ -505,7 +688,7 @@ export default function seajs(global, undefined) {
 
   // Load module.dependencies and fire onload when all done
   Module.prototype.load = function () {
-    var mod = this;
+    const mod = this;
 
     // If the module is being loaded, just wait it onload call
     if (mod.status >= STATUS.LOADING) {
@@ -515,21 +698,21 @@ export default function seajs(global, undefined) {
     mod.status = STATUS.LOADING;
 
     // Emit `load` event for plugins such as combo plugin
-    var uris = mod.resolve();
-    emit("load", uris);
+    const uris = mod.resolve();
+    emit('load', uris);
 
-    var len = (mod._remain = uris.length);
-    var m;
+    const len = (mod._remain = uris.length);
+    let m;
 
     // Initialize modules and register waitings
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       m = Module.get(uris[i]);
 
       if (m.status < STATUS.LOADED) {
         // Maybe duplicate: When module has dupliate dependency, it should be it's count, not 1
         m._waitings[mod.uri] = (m._waitings[mod.uri] || 0) + 1;
       } else {
-        mod._remain--;
+        mod._remain -= 1;
       }
     }
 
@@ -539,9 +722,9 @@ export default function seajs(global, undefined) {
     }
 
     // Begin parallel loading
-    var requestCache = {};
+    const requestCache = {};
 
-    for (i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       m = cachedMods[uris[i]];
 
       if (m.status < STATUS.FETCHING) {
@@ -552,8 +735,8 @@ export default function seajs(global, undefined) {
     }
 
     // Send all requests at last to avoid cache bug in IE6-9. Issues#808
-    for (var requestUri in requestCache) {
-      if (requestCache.hasOwnProperty(requestUri)) {
+    for (const requestUri in requestCache) {
+      if (Object.prototype.hasOwnProperty.call(requestCache, requestUri)) {
         requestCache[requestUri]();
       }
     }
@@ -561,7 +744,7 @@ export default function seajs(global, undefined) {
 
   // Call this method when module is loaded
   Module.prototype.onload = function () {
-    var mod = this;
+    const mod = this;
     mod.status = STATUS.LOADED;
 
     if (mod.callback) {
@@ -569,11 +752,12 @@ export default function seajs(global, undefined) {
     }
 
     // Notify waiting modules to fire onload
-    var waitings = mod._waitings;
-    var uri, m;
+    const waitings = mod._waitings;
+    let uri;
+    let m;
 
     for (uri in waitings) {
-      if (waitings.hasOwnProperty(uri)) {
+      if (Object.prototype.hasOwnProperty.call(waitings, uri)) {
         m = cachedMods[uri];
         m._remain -= waitings[uri];
         if (m._remain === 0) {
@@ -589,15 +773,15 @@ export default function seajs(global, undefined) {
 
   // Fetch a module
   Module.prototype.fetch = function (requestCache) {
-    var mod = this;
-    var uri = mod.uri;
+    const mod = this;
+    const { uri } = mod;
 
     mod.status = STATUS.FETCHING;
 
     // Emit `fetch` event for plugins such as combo plugin
-    var emitData = { uri: uri };
-    emit("fetch", emitData);
-    var requestUri = emitData.requestUri || uri;
+    let emitData = { uri };
+    emit('fetch', emitData);
+    const requestUri = emitData.requestUri || uri;
 
     // Empty uri or a non-CMD module
     if (!requestUri || fetchedList[requestUri]) {
@@ -615,33 +799,22 @@ export default function seajs(global, undefined) {
 
     // Emit `request` event for plugins such as text plugin
     emit(
-      "request",
+      'request',
       (emitData = {
-        uri: uri,
-        requestUri: requestUri,
-        onRequest: onRequest,
-        charset: isFunction(data.charset)
-          ? data.charset(requestUri)
-          : data.charset,
-        crossorigin: isFunction(data.crossorigin)
-          ? data.crossorigin(requestUri)
-          : data.crossorigin,
-      })
+        uri,
+        requestUri,
+        onRequest,
+        charset: isFunction(data.charset) ? data.charset(requestUri) : data.charset,
+        crossorigin: isFunction(data.crossorigin) ? data.crossorigin(requestUri) : data.crossorigin,
+      }),
     );
 
     if (!emitData.requested) {
-      requestCache
-        ? (requestCache[emitData.requestUri] = sendRequest)
-        : sendRequest();
+      requestCache ? (requestCache[emitData.requestUri] = sendRequest) : sendRequest();
     }
 
     function sendRequest() {
-      seajs.request(
-        emitData.requestUri,
-        emitData.onRequest,
-        emitData.charset,
-        emitData.crossorigin
-      );
+      seajs.request(emitData.requestUri, emitData.onRequest, emitData.charset, emitData.crossorigin);
     }
 
     function onRequest() {
@@ -655,8 +828,8 @@ export default function seajs(global, undefined) {
       }
 
       // Call callbacks
-      var m,
-        mods = callbackList[requestUri];
+      let m;
+      const mods = callbackList[requestUri];
       delete callbackList[requestUri];
       while ((m = mods.shift())) m.load();
     }
@@ -664,7 +837,7 @@ export default function seajs(global, undefined) {
 
   // Execute a module
   Module.prototype.exec = function () {
-    var mod = this;
+    const mod = this;
 
     // When module is executed, DO NOT execute it again. When module
     // is being executed, just return `module.exports` too, for avoiding
@@ -676,7 +849,7 @@ export default function seajs(global, undefined) {
     mod.status = STATUS.EXECUTING;
 
     // Create require
-    var uri = mod.uri;
+    const { uri } = mod;
 
     function require(id) {
       return Module.get(require.resolve(id)).exec();
@@ -687,16 +860,14 @@ export default function seajs(global, undefined) {
     };
 
     require.async = function (ids, callback) {
-      Module.use(ids, callback, uri + "_async_" + cid());
+      Module.use(ids, callback, `${uri}_async_${cid()}`);
       return require;
     };
 
     // Exec factory
-    var factory = mod.factory;
+    const { factory } = mod;
 
-    var exports = isFunction(factory)
-      ? factory(require, (mod.exports = {}), mod)
-      : factory;
+    let exports = isFunction(factory) ? factory(require, (mod.exports = {}), mod) : factory;
 
     if (exports === undefined) {
       exports = mod.exports;
@@ -709,7 +880,7 @@ export default function seajs(global, undefined) {
     mod.status = STATUS.EXECUTED;
 
     // Emit `exec` event
-    emit("exec", mod);
+    emit('exec', mod);
 
     return exports;
   };
@@ -717,15 +888,15 @@ export default function seajs(global, undefined) {
   // Resolve id to uri
   Module.resolve = function (id, refUri) {
     // Emit `resolve` event for plugins such as text plugin
-    var emitData = { id: id, refUri: refUri };
-    emit("resolve", emitData);
+    const emitData = { id, refUri };
+    emit('resolve', emitData);
 
     return emitData.uri || seajs.resolve(emitData.id, refUri);
   };
 
   // Define a module
   Module.define = function (id, deps, factory) {
-    var argsLen = arguments.length;
+    const argsLen = arguments.length;
 
     // define(factory)
     if (argsLen === 1) {
@@ -750,16 +921,16 @@ export default function seajs(global, undefined) {
       deps = parseDependencies(factory.toString());
     }
 
-    var meta = {
-      id: id,
+    const meta = {
+      id,
       uri: Module.resolve(id),
-      deps: deps,
-      factory: factory,
+      deps,
+      factory,
     };
 
     // Try to derive uri in IE6-9 for anonymous modules
     if (!meta.uri && doc.attachEvent) {
-      var script = getCurrentScript();
+      const script = getCurrentScript();
 
       if (script) {
         meta.uri = script.src;
@@ -770,7 +941,7 @@ export default function seajs(global, undefined) {
     }
 
     // Emit `define` event, used in nocache plugin, seajs node version etc
-    emit("define", meta);
+    emit('define', meta);
 
     meta.uri
       ? Module.save(meta.uri, meta)
@@ -780,7 +951,7 @@ export default function seajs(global, undefined) {
 
   // Save meta data to cachedMods
   Module.save = function (uri, meta) {
-    var mod = Module.get(uri);
+    const mod = Module.get(uri);
 
     // Do NOT override already saved modules
     if (mod.status < STATUS.SAVED) {
@@ -798,13 +969,13 @@ export default function seajs(global, undefined) {
 
   // Use function is equal to load a anonymous module
   Module.use = function (ids, callback, uri) {
-    var mod = Module.get(uri, isArray(ids) ? ids : [ids]);
+    const mod = Module.get(uri, isArray(ids) ? ids : [ids]);
 
     mod.callback = function () {
-      var exports = [];
-      var uris = mod.resolve();
+      const exports = [];
+      const uris = mod.resolve();
 
-      for (var i = 0, len = uris.length; i < len; i++) {
+      for (let i = 0, len = uris.length; i < len; i++) {
         exports[i] = cachedMods[uris[i]].exec();
       }
 
@@ -820,20 +991,20 @@ export default function seajs(global, undefined) {
 
   // Load preload modules before all other modules
   Module.preload = function (callback) {
-    var preloadMods = data.preload;
-    var len = preloadMods.length;
+    const preloadMods = data.preload;
+    const len = preloadMods.length;
 
     if (len) {
       Module.use(
         preloadMods,
-        function () {
+        () => {
           // Remove the loaded preload modules
           preloadMods.splice(0, len);
 
           // Allow preload modules to add new preload modules
           Module.preload(callback);
         },
-        data.cwd + "_preload_" + cid()
+        `${data.cwd}_preload_${cid()}`,
       );
     } else {
       callback();
@@ -843,8 +1014,8 @@ export default function seajs(global, undefined) {
   // Public API
 
   seajs.use = function (ids, callback) {
-    Module.preload(function () {
-      Module.use(ids, callback, data.cwd + "_use_" + cid());
+    Module.preload(() => {
+      Module.use(ids, callback, `${data.cwd}_use_${cid()}`);
     });
     return seajs;
   };
@@ -859,7 +1030,7 @@ export default function seajs(global, undefined) {
   data.cid = cid;
 
   seajs.require = function (id) {
-    var mod = Module.get(Module.resolve(id));
+    const mod = Module.get(Module.resolve(id));
     if (mod.status < STATUS.EXECUTING) {
       mod.onload();
       mod.exec();
@@ -871,12 +1042,12 @@ export default function seajs(global, undefined) {
    * config.js - The configuration for the loader
    */
 
-  var BASE_RE = /^(.+?\/)(\?\?)?(seajs\/)+/;
+  const BASE_RE = /^(.+?\/)(\?\?)?(seajs\/)+/;
 
   // The root path to use for id2uri parsing
   // If loaderUri is `http://test.com/libs/seajs/[??][seajs/1.2.3/]sea.js`, the
   // baseUri should be `http://test.com/libs/`
-  data.base = (loaderDir.match(BASE_RE) || ["", loaderDir])[1];
+  data.base = (loaderDir.match(BASE_RE) || ['', loaderDir])[1];
 
   // The loader directory
   data.dir = loaderDir;
@@ -885,24 +1056,24 @@ export default function seajs(global, undefined) {
   data.cwd = cwd;
 
   // The charset for requesting files
-  data.charset = "utf-8";
+  data.charset = 'utf-8';
 
   // The CORS options, Do't set CORS on default.
   data.crossorigin = false;
 
   // Modules that are needed to load before all other modules
   data.preload = (function () {
-    var plugins = [];
+    const plugins = [];
 
     // Convert `seajs-xxx` to `seajs-xxx=1`
     // NOTE: use `seajs-xxx=1` flag in uri or cookie to preload `seajs-xxx`
-    var str = location.search.replace(/(seajs-\w+)(&|$)/g, "$1=1$2");
+    let str = location.search.replace(/(seajs-\w+)(&|$)/g, '$1=1$2');
 
     // Add cookie string
-    str += " " + doc.cookie;
+    str += ` ${doc.cookie}`;
 
     // Exclude seajs-xxx=0
-    str.replace(/(seajs-\w+)=1/g, function (m, name) {
+    str.replace(/(seajs-\w+)=1/g, (m, name) => {
       plugins.push(name);
     });
 
@@ -916,13 +1087,13 @@ export default function seajs(global, undefined) {
   // data.debug - Debug mode. The default value is false
 
   seajs.config = function (configData) {
-    for (var key in configData) {
-      var curr = configData[key];
-      var prev = data[key];
+    for (const key in configData) {
+      let curr = configData[key];
+      const prev = data[key];
 
       // Merge object config such as alias, vars
       if (prev && isObject(prev)) {
-        for (var k in curr) {
+        for (const k in curr) {
           prev[k] = curr[k];
         }
       } else {
@@ -931,10 +1102,10 @@ export default function seajs(global, undefined) {
           curr = prev.concat(curr);
         }
         // Make sure that `data.base` is an absolute path
-        else if (key === "base") {
+        else if (key === 'base') {
           // Make sure end with "/"
-          if (curr.slice(-1) !== "/") {
-            curr += "/";
+          if (curr.slice(-1) !== '/') {
+            curr += '/';
           }
           curr = addBase(curr);
         }
@@ -944,7 +1115,7 @@ export default function seajs(global, undefined) {
       }
     }
 
-    emit("config", configData);
+    emit('config', configData);
     return seajs;
   };
 }

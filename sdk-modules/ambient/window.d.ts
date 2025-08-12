@@ -18,6 +18,8 @@ declare interface Window {
   QCBASE_HOST: string;
   /** e.g. cloudcache.tencent-cloud.cn */
   QCCDN_HOST: string;
+  /** e.g. cloudcache.tencentcs.cn */
+  QCCDN_BACKUP_HOST: string;
   /** e.g. buy.cloud.tencent.com */
   QCBUY_HOST: string;
   /** e.g. cloud.tencent.com */

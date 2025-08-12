@@ -41,11 +41,14 @@ declare const seajs: {
    * 获取已加载过的 CMD 模块，控制台内置模块都在业务加载前已经提前加载了
    */
   require: (moduleId: string) => any;
-
+  // 原始的require函数
+  seaRequire: (moduleId: string) => any;
   /**
    *  异步加载新的 CMD 模块
    */
   use: (moduleId: string, cb: Callback) => void;
+  // 原始的use函数
+  seaUse: (moduleId: string, cb: Callback) => void;
 
   /** 自定义has方法，用于检测模块是否真实存在，而不是proxy的假对象 */
   has: (moduleId: string) => boolean;
@@ -68,6 +71,7 @@ declare interface Window {
   TeaSDKRunner: any;
   getLifeInfo: () => Object;
   QCCDN_HOST: string;
+  QCCDN_BACKUP_HOST: string;
 }
 
 /**

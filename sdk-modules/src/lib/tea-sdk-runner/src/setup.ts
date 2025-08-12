@@ -15,6 +15,11 @@ import { proxy } from './util/proxy';
 import Seajs from './util/sea';
 import { initSupport } from './util/support';
 import { warn } from './util/warn';
+import './util/chunkLoader';
+
+// 控制台使用的 cdn 域名，用于校验静态资源是否是控制台资源
+const USEFUL_CDN_DOMAIN_REGEX =
+  /^(https?:)?\/\/(imgcache\.qq\.com|cloudcache\.(tencent-cloud|tencentcs)(\.com|(\.com)?\.cn))/;
 
 /**
  * 准备 Seajs 环境
@@ -48,9 +53,12 @@ function initShim(modules: SDKRunnerEnvModules) {
   };
 
   const seaRequire = window.seajs.require;
+  const seaUse = window.seajs.use;
 
   window.seajs = {
     ...(window.seajs || {}),
+    seaRequire,
+    seaUse,
     use: (moduleId, cb) => {
       if (!modules[moduleId]) {
         warn(`模块 ${moduleId} 未定义`);
@@ -126,7 +134,7 @@ export function setup({
     const globalCssSdk = sdks.find((sdk) => sdk.name === 'global-css-sdk');
     if (globalCssSdk) {
       const globalCss = (globalCssSdk.css as string[])?.map((css) =>
-        css.replace(/imgcache.qq.com|cloudcache.tencent-cloud.com/, cdnHost),
+        css.replace(USEFUL_CDN_DOMAIN_REGEX, `//:${cdnHost}`),
       );
       globalCss
         .filter(

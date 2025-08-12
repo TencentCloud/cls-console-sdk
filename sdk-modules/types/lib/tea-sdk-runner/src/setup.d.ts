@@ -1,4 +1,5 @@
 import { SDKRunnerSetupOptions } from './type';
+import './util/chunkLoader';
 /**
  * 初始化 Runner
  */

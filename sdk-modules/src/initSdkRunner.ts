@@ -243,6 +243,7 @@ function initQcHost(loginInfo: ClsSdkInitParams['loginInfo']) {
   (window as any).QCLOUD_ROOT_HOST = QCLOUD_ROOT_HOST;
   (window as any).QCMAIN_HOST = !isI18n ? 'cloud.tencent.com' : 'www.tencentcloud.com';
   (window as any).QCCDN_HOST = 'cloudcache.tencent-cloud.com';
+  (window as any).QCCDN_BACKUP_HOST = 'cloudcache.tencentcs.com';
   (window as any).QCCONSOLE_HOST = `console.${QCLOUD_ROOT_HOST}`;
   (window as any).QCBASE_HOST = `iaas.${QCLOUD_ROOT_HOST}`;
   (window as any).QCBUY_HOST = `buy.${QCLOUD_ROOT_HOST}`;
