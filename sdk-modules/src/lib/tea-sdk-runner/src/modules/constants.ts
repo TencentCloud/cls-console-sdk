@@ -768,14 +768,12 @@ export const constantsEn = {
 };
 
 export const getConstantsModules = (language: 'zh' | 'en' = 'zh', regionConstants?: RegionConstants) => {
-  if (regionConstants) {
-    return {
-      'config/constants': regionConstants,
-      constants: regionConstants,
-    };
-  }
-
   const constants = language === 'zh' ? constantsZh : constantsEn;
+  if (regionConstants) {
+    Object.keys(regionConstants).forEach((key) => {
+      constants[key] = { ...(constants[key] || {}), ...(regionConstants[key] || {}) };
+    });
+  }
   return {
     'config/constants': constants,
     constants,
