@@ -29,8 +29,6 @@ secretKey=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #demoPassword=123456
 # 独立部署所在域名，设置后页面内所有跳转默认使用该域名
 #CLS_DEPLOYMENT_HOST=clsiframe.com
-# 独立部署的后端服务是否支持转发SSE云API接口
-#CLS_SUPPORT_SSE=true
 ```
 
 ## 部署项目
