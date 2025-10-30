@@ -136,13 +136,13 @@ export async function initSdkRunner(params: ClsSdkInitParams) {
   // 加载用户ID信息
   const needInitLoginInfo = !(loginInfo?.appId && loginInfo?.ownerUin && loginInfo?.loginUin && loginInfo?.area);
   if (needInitLoginInfo) {
-    promises.push(DescribeCurrentUserDetails(capi));
+    promises.push(getUserInfo(capi));
   }
   // 并发发起请求
   const [configVersionResult, regionConstants, userIdInfo] = await Promise.all(promises);
 
   if (needInitLoginInfo) {
-    loginInfo.appId = Number(userIdInfo.AppId?.[0]);
+    loginInfo.appId = Number(userIdInfo.AppId);
     loginInfo.ownerUin = String(userIdInfo.OwnerUin);
     loginInfo.loginUin = String(userIdInfo.Uin);
     loginInfo.area = Number(userIdInfo.Area) > 0 ? Area.International : Area.MainlandChina;
@@ -249,22 +249,35 @@ function initQcHost(loginInfo: ClsSdkInitParams['loginInfo']) {
   (window as any).QCBUY_HOST = `buy.${QCLOUD_ROOT_HOST}`;
 }
 
-async function DescribeCurrentUserDetails(capi: SDKRunnerSetupOptions['capi']): Promise<{
-  AppId: number[];
-  OwnerUin: number;
-  Uin: number;
+async function getUserInfo(capi: SDKRunnerSetupOptions['capi']): Promise<{
+  AppId: number;
+  OwnerUin: string;
+  Uin: string;
   Area: string;
   RequestId: string;
 }> {
-  const res = await capi({
-    regionId: 1,
-    serviceType: 'account',
-    cmd: 'DescribeCurrentUserDetails',
-    data: {
-      Version: '2018-12-25',
-    },
-  });
-  return res.Response;
+  const [userDetails, userAppId] = await Promise.all([
+    capi({
+      regionId: 1,
+      serviceType: 'account',
+      cmd: 'DescribeCurrentUserDetails',
+      data: {
+        Version: '2018-12-25',
+      },
+    }),
+    capi({
+      regionId: 1,
+      serviceType: 'cam',
+      cmd: 'GetUserAppId',
+      data: {
+        Version: '2019-01-16',
+      },
+    }),
+  ]);
+  return {
+    ...userDetails.Response, // 使用userDetails的Area字段
+    ...userAppId.Response, // 使用userAppId的Uin, OwnerUin, AppId字段
+  };
 }
 
 async function getConsoleConfigVersion(capi: SDKRunnerSetupOptions['capi']): Promise<
