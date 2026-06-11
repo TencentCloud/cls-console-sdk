@@ -134,7 +134,7 @@ export function setup({
     const globalCssSdk = sdks.find((sdk) => sdk.name === 'global-css-sdk');
     if (globalCssSdk) {
       const globalCss = (globalCssSdk.css as string[])?.map((css) =>
-        css.replace(USEFUL_CDN_DOMAIN_REGEX, `//:${cdnHost}`),
+        css.replace(USEFUL_CDN_DOMAIN_REGEX, `//${cdnHost}`),
       );
       globalCss
         .filter(
