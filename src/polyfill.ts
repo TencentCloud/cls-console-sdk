@@ -8,10 +8,4 @@
 // 对 generator/yeild， async/await 等的支持。平台已支持
 import 'regenerator-runtime/runtime';
 
-// menus-sdk 依赖了 jquery，这里引入避免报错
-import jquery from 'jquery';
-
-// @ts-ignore
-window.$ = jquery;
-// @ts-ignore
-window.jQuery = jquery;
+// jQuery 全局挂载已下沉到 @tencent/cls-sdk-modules（initSdkRunner 副作用），此处不再处理

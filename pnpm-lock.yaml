@@ -29,9 +29,6 @@ importers:
       history:
         specifier: ^4.10.1
         version: 4.10.1
-      jquery:
-        specifier: ^3.7.1
-        version: 3.7.1
       js-cookie:
         specifier: ^2.2.1
         version: 2.2.1
@@ -2070,9 +2067,6 @@ packages:
   isobject@3.0.1:
     resolution: {integrity: sha512-WhB9zCku7EGTj/HQQRz5aUQEUeoQZH2bWcltRErOpymJ4boYE6wL9Tbr23krRPSZ+C5zqNSrSw+Cc7sZZ4b7vg==}
     engines: {node: '>=0.10.0'}
-
-  jquery@3.7.1:
-    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
   js-base64@2.6.4:
     resolution: {integrity: sha512-pZe//GGmwJndub7ZghVHz7vjb2LgC1m8B07Au3eYqeqv9emhESByMXxaEgkUkEqJe87oBbSniGYoQNIBklc7IQ==}
@@ -5382,8 +5376,6 @@ snapshots:
       isarray: 1.0.0
 
   isobject@3.0.1: {}
-
-  jquery@3.7.1: {}
 
   js-base64@2.6.4: {}
 

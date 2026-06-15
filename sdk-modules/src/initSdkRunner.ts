@@ -1,10 +1,20 @@
 import type { History } from 'history';
+import jquery from 'jquery';
 import { flatten } from 'lodash-es';
 
 import moment from './lib/moment';
 import { setup } from './lib/tea-sdk-runner/src';
 import { RegionConstants, SDKRunnerSetupOptions } from './lib/tea-sdk-runner/src/type';
 import { getLocalStorageItem, safeJsonParse, setLocalStorageItem } from './utils/localStorageUtil';
+
+// menus-sdk 依赖了挂在 window 上的 jQuery；模块化打包下 jQuery 默认不会自动挂全局，
+// 此处仅在宿主环境未提供 jQuery 时挂一份，避免覆盖宿主已有版本（控制台等场景）。
+if (!(window as any).jQuery) {
+  (window as any).jQuery = jquery;
+}
+if (!(window as any).$) {
+  (window as any).$ = jquery;
+}
 
 window.moment = moment;
 moment.locale('zh-cn');

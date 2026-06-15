@@ -26,3 +26,9 @@ declare interface Window {
   /** 描述当前环境是否基于SDK */
   TeaSDKRunner: boolean;
 }
+
+// 未安装 @types/jquery；这里仅为 import 'jquery' 提供最小模块声明
+declare module 'jquery' {
+  const jquery: any;
+  export default jquery;
+}
