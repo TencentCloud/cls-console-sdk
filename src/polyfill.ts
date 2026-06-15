@@ -9,4 +9,9 @@
 import 'regenerator-runtime/runtime';
 
 // menus-sdk 依赖了 jquery，这里引入避免报错
-import 'jquery';
+import jquery from 'jquery';
+
+// @ts-ignore
+window.$ = jquery;
+// @ts-ignore
+window.jQuery = jquery;
