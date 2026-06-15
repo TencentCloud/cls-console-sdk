@@ -7,3 +7,6 @@
 
 // 对 generator/yeild， async/await 等的支持。平台已支持
 import 'regenerator-runtime/runtime';
+
+// menus-sdk 依赖了 jquery，这里引入避免报错
+import 'jquery';
