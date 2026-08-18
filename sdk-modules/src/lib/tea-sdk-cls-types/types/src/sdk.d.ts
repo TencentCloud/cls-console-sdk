@@ -9,9 +9,11 @@ import './app.scss';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 /** 仪表盘使用chunk方式进行加载 */
+import { ISdkAgentObservePageControl, ISdkAgentObservePageProps } from './sdk/AgentObservePage/chunk';
 import { ISdkDashboardPageControl, ISdkDashboardPageProps } from './sdk/DashboardPage/chunk';
 /** 检索页使用chunk方式进行加载 */
 import { ISdkSearchPageProps, ISdkSearchPageControl } from './sdk/SearchPage/chunk';
+/** Agent可观测页面使用chunk方式进行加载 */
 declare const SdkApi: {
   /** SDK 测通方法，可保留可不保留 */
   hello: () => string;
@@ -31,7 +33,26 @@ declare const SdkApi: {
   DataSight: {
     DataSightComponent: import('react').ComponentType<object & import('react').RefAttributes<any>>;
   };
+  /** Agent可观测页面 */
+  AgentObservePage: {
+    AgentObservePageRoutes: import('react').ForwardRefExoticComponent<
+      import('./sdk/AgentObservePage/SdkAgentObservePage').ISdkAgentObservePageProps &
+        import('react').RefAttributes<any>
+    >;
+    AgentObserveDetailPageComponent: import('react').ForwardRefExoticComponent<
+      import('./sdk/AgentObservePage/SdkAgentObservePage').ISdkAgentObservePageProps &
+        import('react').RefAttributes<any>
+    >;
+  };
 };
 export default SdkApi;
 declare type ISdkApi = typeof SdkApi;
-export { ISdkApi, ISdkDashboardPageControl, ISdkDashboardPageProps, ISdkSearchPageControl, ISdkSearchPageProps };
+export {
+  ISdkApi,
+  ISdkAgentObservePageControl,
+  ISdkAgentObservePageProps,
+  ISdkDashboardPageControl,
+  ISdkDashboardPageProps,
+  ISdkSearchPageControl,
+  ISdkSearchPageProps,
+};

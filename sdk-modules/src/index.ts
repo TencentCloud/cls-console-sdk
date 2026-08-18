@@ -1,5 +1,7 @@
 export type {
   ISdkApi,
+  ISdkAgentObservePageControl,
+  ISdkAgentObservePageProps,
   ISdkDashboardPageControl,
   ISdkDashboardPageProps,
   ISdkSearchPageControl,
@@ -11,3 +13,4 @@ export { DEFAULTREGIONIDMAP } from './lib/tea-sdk-runner/src/modules/constants';
 export * from './initSdkRunner';
 export * from './SdkSearchPage';
 export * from './SdkDashboard';
+export * from './SdkAgentObserve';

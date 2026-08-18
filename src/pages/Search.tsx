@@ -51,9 +51,9 @@ export function SearchPage({ history }: { history: History }) {
     history.replace(updatedUrl, history.location.state);
   }, [history, innerPageParams]);
 
-  useEffect(() => {
-    console.log('pageParams:', innerPageParams);
-  }, [innerPageParams]);
+  // useEffect(() => {
+  //  console.log('pageParams:', innerPageParams);
+  // }, [innerPageParams]);
 
   return (
     <div style={{ height: '100%' }}>

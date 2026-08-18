@@ -6,6 +6,7 @@ import React, { useMemo } from 'react';
 import { Route, Router, Switch } from 'react-router-dom';
 
 import { LoginCheck } from './LoginCheck';
+import { AgentObservePage } from './pages/AgentObserve';
 import { DashboardPage } from './pages/Dashboard';
 import { DataSightPage } from './pages/DataSight';
 import { PageIndex } from './pages/PageIndex';
@@ -35,6 +36,12 @@ export default function App() {
                     key={'/cls/datasight'}
                     exact
                     render={(props) => <DataSightPage {...props} />}
+                  />
+                  <Route
+                    path={'/cls/agent/observe/agent-detail'}
+                    key={'/cls/agent'}
+                    exact
+                    render={(props) => <AgentObservePage {...props} />}
                   />
                   <Route path={'/'} key={'/'} exact render={(props) => <PageIndex {...props} />} />
                 </Switch>
