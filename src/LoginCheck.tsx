@@ -10,7 +10,8 @@ import { getForwardData } from './utils/capi';
 export const LoginCheck = (props) => {
   const forceUpdate = useUpdate();
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // isLoggedIn: 初始为 null 表示登录态校验中，此时不渲染密码输入框，避免校验通过前输入框一闪而过
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [pwd, setPwd] = useState('');
   useEffectOnce(() => {
     const language = Cookie.get('language') as 'zh' | 'en';
@@ -35,6 +36,10 @@ export const LoginCheck = (props) => {
       setIsLoggedIn(true);
     } catch (error) {}
   };
+  if (isLoggedIn === null) {
+    // 登录态校验中
+    return null;
+  }
   return !isLoggedIn ? (
     <LoginModal showModal={!isLoggedIn} pwd={pwd} setPwd={setPwd} onHide={onHide} onConfirm={onConfirm} />
   ) : (
