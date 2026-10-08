@@ -9,6 +9,9 @@ import {
 
 import { renderUrl } from '../utils/url';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __DEV__ = import.meta.env.DEV;
+
 export function AgentObservePage({ history }: { history: History }) {
   const agentObservePageControlRef = useRef<ISdkAgentObservePageControl | null>(null as any);
 
@@ -57,6 +60,15 @@ export function AgentObservePage({ history }: { history: History }) {
 
   return (
     <div style={{ height: '100%' }}>
+      {__DEV__ && (
+        <div style={{ padding: 20, borderBottom: '1px solid black' }}>
+          调试逻辑，完成调试后删除本段代码
+          <br />
+          pageParams 是当前传递给组件的参数，并非页面内的实时内容
+          <p>{JSON.stringify(pageParams)}</p>
+          <p>{JSON.stringify(hideParams)}</p>
+        </div>
+      )}
       <SdkAgentObserveDetailPage
         controlRef={agentObservePageControlRef}
         hideParams={hideParams}
@@ -74,7 +86,7 @@ function categorizeSearchParams(searchParams: URLSearchParams) {
   const pageParams: ISdkAgentObservePageProps['pageParams'] = {};
 
   Array.from(searchParams.keys()).forEach((key) => {
-    if (key.startsWith('hide')) {
+    if (key.startsWith('hide') || key === 'showTabs') {
       hideParams[key] = searchParams.get(key);
     } else {
       const paramValue = searchParams.getAll(key);
