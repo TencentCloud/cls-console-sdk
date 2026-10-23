@@ -1,4 +1,4 @@
-FROM node:20-alpine as builder
+FROM node:22.23.4-alpine as builder
 
 LABEL service=cls_console_sdk
 
